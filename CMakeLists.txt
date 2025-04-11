@@ -7,11 +7,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(EMSCRIPTEN)
     set(PLATFORM "wasm")
     set(PLATFORM_NAME "wasm")
+    add_compile_definitions(PLATFORM_WASM=1)
 
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist/assets)
 
     set(EMSCRIPTEN_FLAGS
-        "-s USE_GLFW=3"
+        "-s USE_SDL=0"
+        "-s ALLOW_MEMORY_GROWTH=1"
+        "-s MAX_WEBGL_VERSION=2"
+        "-s FETCH=1"
+        "-s USE_PTHREADS=0"
         "-s ASSERTIONS=1"
         "-s WASM=1"
         "-s ASYNCIFY"
@@ -24,9 +29,11 @@ if(EMSCRIPTEN)
 elseif(APPLE)
     set(PLATFORM "macos")
     set(PLATFORM_NAME "macos")
+    add_compile_definitions(PLATFORM_MACOS=1)
 elseif(WIN32)
     set(PLATFORM "windows")
     set(PLATFORM_NAME "windows")
+    add_compile_definitions(PLATFORM_WINDOWS=1)
 elseif(UNIX AND NOT APPLE)
     set(PLATFORM "linux")
     set(PLATFORM_NAME "linux")
@@ -55,9 +62,9 @@ endif()
 # Set output directories based on platform
 if(EMSCRIPTEN)
     # For WASM builds, put executable files in the dist subdirectory
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist/lib)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist/lib)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist/assets)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist/assets/lib)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist/assets/lib)
 else()
     # For non-WASM builds, put executable files directly in platform directory
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH})
@@ -88,6 +95,7 @@ if(EMSCRIPTEN)
         POST_BUILD
         # Create dist directory for all content except serve.js
         COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}/dist
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}/dist/assets
         # Copy serve.js directly to the bin/wasm-wasm32 directory
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${WASM_SOURCE_DIR}/serve.js ${OUTPUT_DIR}/serve.js
         # Copy all other WASM resources to the dist directory
@@ -109,6 +117,78 @@ target_include_directories(pixel_pulse PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/external
 )
+
+if(APPLE)
+    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/3.2.10/macos-universal/static)
+
+    target_include_directories(pixel_pulse PRIVATE
+        ${SDL_ROOT}/include
+    )
+
+    set(SDL_FRAMEWORKS
+        "-framework AppKit"
+        "-framework Foundation"
+        "-framework CoreAudio"
+        "-framework AudioToolbox"
+        "-framework ForceFeedback"
+        "-framework IOKit"
+        "-framework CoreVideo"
+        "-framework QuartzCore"
+        "-framework Metal"
+        "-framework AVFoundation"
+        "-framework CoreMedia"
+        "-framework GameController"
+        "-framework CoreHaptics"
+        "-framework CoreServices"
+        "-framework UniformTypeIdentifiers"
+        "-framework ApplicationServices"
+        "-framework Carbon"
+    )
+
+    target_link_libraries(pixel_pulse PRIVATE
+        ${SDL_ROOT}/lib/libSDL3-universal.a
+        ${SDL_FRAMEWORKS}
+    )
+elseif(WIN32)
+    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/3.2.10/windows-universal)
+
+    target_include_directories(pixel_pulse PRIVATE
+        ${SDL_ROOT}/include
+    )
+
+    if(PLATFORM_ARCH STREQUAL "arm64")
+        target_link_libraries(pixel_pulse PRIVATE
+            ${SDL_ROOT}/lib/arm64/SDL3.lib
+            ${SDL_ROOT}/lib/arm64/SDL3main.lib
+        )
+    else()
+        target_link_libraries(pixel_pulse PRIVATE
+            ${SDL_ROOT}/lib/x64/SDL3.lib
+            ${SDL_ROOT}/lib/x64/SDL3main.lib
+        )
+    endif()
+elseif(EMSCRIPTEN)
+    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/3.2.10/wasm-wasm32/static)
+
+    target_include_directories(pixel_pulse PRIVATE
+        ${SDL_ROOT}/include
+    )
+
+    target_link_libraries(pixel_pulse PRIVATE
+        ${SDL_ROOT}/lib/libSDL3.a
+    )
+else()
+    # For Linux, assume SDL is installed in the system
+    # or provide path to custom SDL installation
+    # Example for a custom path:
+    # set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/3.2.10/linux)
+    # target_include_directories(pixel_pulse PRIVATE ${SDL_ROOT}/include)
+    # target_link_libraries(pixel_pulse PRIVATE ${SDL_ROOT}/lib/libSDL3.a)
+
+    # For system SDL:
+    find_package(SDL3 REQUIRED)
+    target_link_libraries(pixel_pulse PRIVATE SDL3::SDL3)
+endif()
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -164,7 +244,6 @@ else()
         -Wconversion             # Warn on type conversions that may lose data
         -Wshadow                 # Warn when a local variable shadows another variable
         -Wunused                 # Warn on anything being unused
-        -Wold-style-cast         # Warn for c-style casts
         -Wcast-align             # Warn for potential performance problem casts
         -Woverloaded-virtual     # Warn when overloading virtual functions
         -Wsign-conversion        # Warn on sign conversions
@@ -178,6 +257,14 @@ else()
         -fstrict-aliasing
     )
 
+    # Special flags for Emscripten/WASM
+    if(EMSCRIPTEN)
+        target_compile_options(pixel_pulse PRIVATE
+            -Wno-disabled-macro-expansion # Disable warnings about disabled macro expansion
+            -Wno-unsafe-buffer-usage-in-libc-call # Disable warnings about unsafe buffer usage in libc calls
+        )
+    endif()
+
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(pixel_pulse PRIVATE
             -Wmost
@@ -189,6 +276,9 @@ else()
             -Wno-documentation   # Don't warn about minor doc issues
             -Wno-poison-system-directories # Don't warn about system include directories
             -Wno-newline-eof     # Don't warn about missing newline at end of file
+            -Wno-old-style-cast   # Don't warn about old-style casts (SDL uses them)
+            -Wno-documentation-unknown-command  # Don't warn about documentation issues
+            -Wno-format-nonliteral # Don't warn about format string issues
         )
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         # GCC specific options

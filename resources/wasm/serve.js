@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const PORT = 3000;
-const BASE_DIR = join(__dirname, 'public');
+const BASE_DIR = join(__dirname, 'dist');
 
 // MIME types mapping
 const MIME_TYPES = {

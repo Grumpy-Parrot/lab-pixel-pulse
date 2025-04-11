@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raylib Test</title>
+    <title>Game</title>
     <style>
         * {
             margin: 0;
@@ -86,6 +86,7 @@
                 }
             },
             locateFile: function (path) {
+                console.log("locateFile: " + path);
                 if (path.endsWith(".data") || path.endsWith(".wasm")) {
                     return "assets/" + path;
                 }
@@ -102,6 +103,6 @@
         window.addEventListener('resize', resizeCanvas, false);
         window.addEventListener('load', resizeCanvas, false);
     </script>
-    <script async type="text/javascript" src="assets/raylib_test.js"></script>
+    <script async type="text/javascript" src="assets/pixel_pulse.js"></script>
 </body>
 </html>

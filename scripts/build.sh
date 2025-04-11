@@ -115,9 +115,10 @@ if [ "$USE_WASM" == "true" ]; then
     echo "Configuring CMake for Emscripten..."
     emcmake cmake -B build/$PLATFORM-$ARCH \
                   -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-                  -DCMAKE_CXX_FLAGS="-O3" \
-                  -DCMAKE_EXE_LINKER_FLAGS="-s MODULARIZE=1 -s EXPORT_NAME='createPixelPulseModule' -s 'EXPORTED_FUNCTIONS=[\"_main\"]'" \
-                  -DCMAKE_INSTALL_PREFIX=bin/$PLATFORM-$ARCH
+                  -DCMAKE_INSTALL_PREFIX=bin/$PLATFORM-$ARCH \
+                  -DCMAKE_EXECUTABLE_SUFFIX=".html"
+
+                  #-DCMAKE_EXE_LINKER_FLAGS="-s MODULARIZE=1 -s EXPORT_NAME='createPixelPulseModule' -s 'EXPORTED_FUNCTIONS=[\"_main\"]'" \
 
     # Add verbose flag if requested
     BUILD_ARGS="--build build/$PLATFORM-$ARCH --config $BUILD_TYPE -j $CORES"
