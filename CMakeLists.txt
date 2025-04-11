@@ -4,6 +4,8 @@ project(PixelPulse VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(SDL_VERSION "3.2.10")
+
 if(EMSCRIPTEN)
     set(PLATFORM "wasm")
     set(PLATFORM_NAME "wasm")
@@ -119,7 +121,7 @@ target_include_directories(pixel_pulse PRIVATE
 )
 
 if(APPLE)
-    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/3.2.10/macos-universal/static)
+    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/release-${SDL_VERSION}/macos-universal/static)
 
     target_include_directories(pixel_pulse PRIVATE
         ${SDL_ROOT}/include
@@ -146,11 +148,11 @@ if(APPLE)
     )
 
     target_link_libraries(pixel_pulse PRIVATE
-        ${SDL_ROOT}/lib/libSDL3-universal.a
+        ${SDL_ROOT}/libSDL3-universal.a
         ${SDL_FRAMEWORKS}
     )
 elseif(WIN32)
-    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/3.2.10/windows-universal)
+    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/release-${SDL_VERSION}/windows-universal)
 
     target_include_directories(pixel_pulse PRIVATE
         ${SDL_ROOT}/include
@@ -168,14 +170,14 @@ elseif(WIN32)
         )
     endif()
 elseif(EMSCRIPTEN)
-    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/3.2.10/wasm-wasm32/static)
+    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/release-${SDL_VERSION}/wasm-wasm32/static)
 
     target_include_directories(pixel_pulse PRIVATE
         ${SDL_ROOT}/include
     )
 
     target_link_libraries(pixel_pulse PRIVATE
-        ${SDL_ROOT}/lib/libSDL3.a
+        ${SDL_ROOT}/libSDL3.a
     )
 else()
     # For Linux, assume SDL is installed in the system

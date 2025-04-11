@@ -8,3 +8,6 @@ bin/*
 !bin/.gitkeep
 
 .cache/
+
+external/**/repo
+external/**/build
