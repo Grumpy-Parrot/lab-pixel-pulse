@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef PLATFORM_API_H
-#define PLATFORM_API_H
+#ifndef GP_PLATFORM_API_H
+#define GP_PLATFORM_API_H
 
 #ifdef PLATFORM_WASM
 #include <emscripten/emscripten.h>
@@ -21,7 +21,6 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <Cocoa/Cocoa.h>
 #endif
-
 #endif
 
 #endif

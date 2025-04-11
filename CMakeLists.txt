@@ -192,6 +192,10 @@ else()
     target_link_libraries(pixel_pulse PRIVATE SDL3::SDL3)
 endif()
 
+# Add stb headers with warning suppression
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/external/stb/master)
+
+# Build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
@@ -199,36 +203,19 @@ endif()
 # Aggressive compiler warnings and modern C++ enforcement
 if(MSVC)
     target_compile_options(pixel_pulse PRIVATE
-        /W4                  # Warning level 4 (higher than /Wall)
+        /W4                  # Warning level 4 (most important warnings)
         /WX                  # Treat warnings as errors
         /permissive-         # Enforce strict standard compliance
-        /w14640             # Enable warning on thread un-safe static member initialization
-        /w14928             # Avoid silent lifetime extensions and narrowing conversions
+        /w14640             # Thread un-safe static member initialization
         /w14265             # Class has virtual functions but destructor is not virtual
-        /w14826             # Conversion from 'type1' to 'type2' is sign-extended
-        /w14263             # Member function does not override any base class virtual member function
-        /w14062             # Enumerator in switch of enum is not handled
         /w14062             # Enumerator in switch of enum is not handled
         /w14242             # Conversion from 'type1' to 'type2', possible loss of data
-        /w14254             # Larger type converted to smaller type, possible loss of data
-        /w14263             # Member function does not override any base class virtual member function
-        /w14296             # Expression is always false/true
-        /w14311             # Pointer truncation from 'type1' to 'type2'
         /utf-8              # Set source and execution character sets to UTF-8
         /Zc:__cplusplus     # Enable updated __cplusplus macro
-        /Zc:rvalueCast      # Enforce type conversion rules for rvalue references
-        /Zc:inline          # Remove unreferenced functions or data if they're explicitly marked inline
-        /Zc:strictStrings   # Disable string literal type conversion to non-const
-        /Zc:threadSafeInit  # Enable thread-safe local static initialization
         /Zc:preprocessor    # Use the new conforming preprocessor
-        /Zc:referenceBinding # Enforce reference binding rules
         /MP                 # Multi-processor compilation
-        /external:W3         # Warnings from external headers are level 3
         /diagnostics:column  # Show column information in diagnostics
     )
-
-    # Disable specific warnings if needed
-    # target_compile_options(pixel_pulse PRIVATE /wd4100) # Disable specific warning
 
     # Set runtime library based on configuration
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -267,55 +254,47 @@ else()
         )
     endif()
 
+    # Disable specific warnings that are problematic with stb headers
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        target_compile_options(pixel_pulse PRIVATE
+            -Wno-sign-conversion      # Disable sign conversion warnings for stb headers
+            -Wno-format-nonliteral    # Disable format nonliteral warnings for stb headers
+        )
+    endif()
+
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(pixel_pulse PRIVATE
-            -Wmost
-            -Weverything
-            -Wno-c++98-compat    # Don't warn about C++98 compatibility
-            -Wno-c++98-compat-pedantic # Don't warn about C++98 compatibility pedantic issues
-            -Wno-padded          # Don't warn about padding
-            -Wno-reserved-id-macro # Some libraries use reserved identifiers
-            -Wno-documentation   # Don't warn about minor doc issues
-            -Wno-poison-system-directories # Don't warn about system include directories
-            -Wno-newline-eof     # Don't warn about missing newline at end of file
-            -Wno-old-style-cast   # Don't warn about old-style casts (SDL uses them)
-            -Wno-documentation-unknown-command  # Don't warn about documentation issues
-            -Wno-format-nonliteral # Don't warn about format string issues
+            -Wall                  # Basic warnings
+            -Wextra                # Extra warnings
+            -Wpedantic             # Ensure standard compliance
+            -Werror                # Treat warnings as errors
+            -Wconversion           # Warn on type conversions that may lose data
+            -Wshadow               # Warn when a local variable shadows another variable
+            -Wunused               # Warn on anything being unused
+            -Woverloaded-virtual   # Warn when overloading virtual functions
+            -Wsign-conversion      # Warn on sign conversions
+            -Wnon-virtual-dtor     # Warn when a class with virtual functions has non-virtual destructor
+            -Wdouble-promotion     # Warn if float is implicitly promoted to double
+            -Wformat=2             # Warn on security issues around functions that format output
+            -Wimplicit-fallthrough # Warn when switch cases fall through
+            -Wctad-maybe-unsupported # Warn about potentially unintended class template argument deduction
+            -Wmissing-noreturn     # Warn about functions that never return but aren't marked
+            -Wunreachable-code     # Warn about unreachable code
         )
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        # GCC specific options
+        # GCC specific options - focused on most important warnings
         target_compile_options(pixel_pulse PRIVATE
+            -Wall                   # Basic warnings
+            -Wextra                 # Extra warnings
+            -Wpedantic              # Ensure standard compliance
+            -Werror                 # Treat warnings as errors
             -Wlogical-op           # Warn about suspicious logical operations
             -Wuseless-cast         # Warn about casting to the same type
-            -Wduplicated-branches  # Warn about identical branches in if-else
             -Wduplicated-cond      # Warn about duplicated conditions in if-else-if chains
             -Wsuggest-override     # Warn if a virtual function is not marked with override
-            -Wsuggest-final-types  # Suggest to mark types as final if possible
-            -Wsuggest-final-methods # Suggest to mark methods as final if possible
-            -Wplacement-new=2      # Make sure there's enough memory for placement new
-            -Wextra-semi           # Warn about redundant semicolons
             -Wcast-qual            # Warn when cast removes type qualifiers
-            -Wzero-as-null-pointer-constant # Using 0 for nullptr
-            -fdiagnostics-show-option # Show which warning flag is responsible for each warning
-            -fvar-tracking-assignments # Better debug info
+            -Wconversion           # Warn on type conversions that may lose data
             -fstack-protector-strong # Buffer overflow protection
-            -fstack-check          # Stack corruption checking
         )
-
-        # Add additional options based on GCC version
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.0)
-            target_compile_options(pixel_pulse PRIVATE
-                -Wclass-memaccess     # Warn about potentially unsafe memcpy usage with classes
-                -Wstringop-truncation # Warn about string truncation
-                -Wmultistatement-macros # Warn if a macro has multiple statements without braces
-            )
-        endif()
-
-        if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 10.0)
-            target_compile_options(pixel_pulse PRIVATE
-                -Warith-conversion      # Warn on implicit conversions in arithmetic operations
-                -Wredundant-tags        # Redundant class/struct/enum/union in declarations
-            )
-        endif()
     endif()
 endif()

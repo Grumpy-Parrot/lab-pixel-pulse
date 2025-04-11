@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef PLATFORM_STD_H
-#define PLATFORM_STD_H
+#ifndef GP_PLATFORM_STD_H
+#define GP_PLATFORM_STD_H
 
 #include <cstdarg>
 #include <cstdio>
