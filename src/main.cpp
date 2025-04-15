@@ -7,6 +7,10 @@
 #include "Assets/AssetRegistry.h"
 #include "Assets/Image.h"
 #include "Game/Sprite.h"
+#include "Math/Vector2.h"
+#include "RenderPassDescriptor.h"
+#include "Game/Input.h"
+#include "Game/UpdateEventPayload.h"
 
 #define UNUSED(x) (void)(x)
 
@@ -17,9 +21,15 @@ private:
     SDL_Renderer *renderer;
     bool shouldQuit;
     AssetRegistry *assetRegistry;
+    Vector2<std::int32_t> windowSize;
+
+    std::uint64_t currentTime;
+    std::uint64_t previousTime;
+    float deltaTime;
 
     // TODO: Replace with scene graph
     std::vector<Sprite *> sprites;
+    Input input;
 
     static void handleEvents(Application *app)
     {
@@ -33,6 +43,11 @@ private:
             else if (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE)
             {
                 app->shouldQuit = true;
+            }
+            else if (event.type == SDL_EVENT_WINDOW_RESIZED)
+            {
+                SDL_GetWindowSize(app->window, &app->windowSize.x, &app->windowSize.y);
+                Logger::info("Window resized to: %d, %d", app->windowSize.x, app->windowSize.y);
             }
         }
     }
@@ -50,7 +65,8 @@ private:
 #endif
 
 public:
-    Application() : window(nullptr), renderer(nullptr), shouldQuit(false)
+    Application() : window(nullptr), renderer(nullptr), shouldQuit(false),
+                 currentTime(0), previousTime(0), deltaTime(0.0f)
     {
 #ifdef PLATFORM_WASM
         instance = this;
@@ -70,6 +86,8 @@ public:
             return false;
         }
 
+        currentTime = previousTime = SDL_GetTicks();
+
         if (!SDL_CreateWindowAndRenderer(title, width, height,
                                          SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE, &window, &renderer))
         {
@@ -77,6 +95,10 @@ public:
             cleanup();
             return false;
         }
+
+        SDL_GetWindowSize(window, &windowSize.x, &windowSize.y);
+        Logger::info("Window size: %d, %d", windowSize.x, windowSize.y);
+        SDL_SetWindowMinimumSize(window, 640, 480);
 
         if (!window || !renderer)
         {
@@ -99,6 +121,9 @@ public:
             return false;
         }
 
+        vampireSprite->move(Vector2<float>(0, 0));
+        vampireSprite->scale(Vector2<float>(0.2f, 0.2f));
+
         sprites.push_back(vampireSprite);
 
         return true;
@@ -108,12 +133,33 @@ public:
     {
         handleEvents(this);
 
+        // Timing
+        previousTime = currentTime;
+        currentTime = SDL_GetTicks();
+        deltaTime = (currentTime - previousTime) / 1000.0f;
+
+        // Subsystem updates
+        input.update(deltaTime);
+
+        UpdateEventPayload updateEventPayload;
+        updateEventPayload.deltaTime = deltaTime;
+        updateEventPayload.input = &input;
+
+        // Render
         SDL_SetRenderDrawColor(renderer, 124, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        RenderPassDescriptor renderPassDescriptor;
+        renderPassDescriptor.windowSize = windowSize;
+
+        Vector2<float> origin;
+        origin.x = 0;
+        origin.y = 0;
+
         for (Sprite *sprite : sprites)
         {
-            sprite->render(renderer, 100, 100);
+            sprite->onUpdate(updateEventPayload);
+            sprite->render(renderer, &renderPassDescriptor);
         }
 
         SDL_RenderPresent(renderer);
