@@ -61,14 +61,22 @@ else()
     set(PLATFORM_ARCH "x86")
 endif()
 
-# Set output directories based on platform
 if(EMSCRIPTEN)
-    # For WASM builds, put executable files in the dist subdirectory
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist/assets)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist/assets/lib)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/dist/assets/lib)
+elseif(WIN32)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH})
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/lib)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/lib)
+
+    foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+        string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH})
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/lib)
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/lib)
+    endforeach()
 else()
-    # For non-WASM builds, put executable files directly in platform directory
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/lib)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM}-${ARCH}/lib)
@@ -90,7 +98,6 @@ add_custom_target(copy_resources ALL
     VERBATIM
 )
 
-# For WASM, create proper directory structure
 if(EMSCRIPTEN)
     add_custom_command(
         TARGET copy_resources
@@ -112,6 +119,15 @@ endif()
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 add_executable(pixel_pulse ${SOURCES})
+
+if(WIN32)
+    set_target_properties(pixel_pulse PROPERTIES
+        DEBUG_OUTPUT_NAME "pixel_pulse-Debug"
+        RELEASE_OUTPUT_NAME "pixel_pulse"
+        MINSIZEREL_OUTPUT_NAME "pixel_pulse"
+        RELWITHDEBINFO_OUTPUT_NAME "pixel_pulse"
+    )
+endif()
 
 add_dependencies(pixel_pulse copy_resources)
 
@@ -158,13 +174,27 @@ elseif(WIN32)
         ${SDL_ROOT}/include
     )
 
+    target_link_libraries(pixel_pulse PRIVATE
+        user32.lib
+        gdi32.lib
+        winmm.lib
+        imm32.lib
+        ole32.lib
+        oleaut32.lib
+        version.lib
+        uuid.lib
+        advapi32.lib
+        setupapi.lib
+        shell32.lib
+    )
+
     if(PLATFORM_ARCH STREQUAL "arm64")
         target_link_libraries(pixel_pulse PRIVATE
             ${SDL_ROOT}/SDL3-arm64.lib
         )
     else()
         target_link_libraries(pixel_pulse PRIVATE
-            ${SDL_ROOT}/SDL3main.lib
+            ${SDL_ROOT}/SDL3-x86_64.lib
         )
     endif()
 elseif(EMSCRIPTEN)

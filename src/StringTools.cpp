@@ -22,8 +22,13 @@ char *CString::join(const char *a, const char *b)
         return nullptr;
     }
 
+#ifdef PLATFORM_WINDOWS
+    strcpy_s(result, total_len, a);
+    strcat_s(result, total_len, b);
+#else
     std::strcpy(result, a);
     std::strcat(result, b);
+#endif
 
     return result;
 }
