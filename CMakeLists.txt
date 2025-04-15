@@ -152,7 +152,7 @@ if(APPLE)
         ${SDL_FRAMEWORKS}
     )
 elseif(WIN32)
-    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/release-${SDL_VERSION}/windows-universal)
+    set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/release-${SDL_VERSION}/windows-universal/static)
 
     target_include_directories(pixel_pulse PRIVATE
         ${SDL_ROOT}/include
@@ -160,13 +160,11 @@ elseif(WIN32)
 
     if(PLATFORM_ARCH STREQUAL "arm64")
         target_link_libraries(pixel_pulse PRIVATE
-            ${SDL_ROOT}/lib/arm64/SDL3.lib
-            ${SDL_ROOT}/lib/arm64/SDL3main.lib
+            ${SDL_ROOT}/SDL3-arm64.lib
         )
     else()
         target_link_libraries(pixel_pulse PRIVATE
-            ${SDL_ROOT}/lib/x64/SDL3.lib
-            ${SDL_ROOT}/lib/x64/SDL3main.lib
+            ${SDL_ROOT}/SDL3main.lib
         )
     endif()
 elseif(EMSCRIPTEN)

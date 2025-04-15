@@ -1,4 +1,13 @@
 # PowerShell version of build.sh for Windows
+# Parse command line arguments
+param(
+    [switch]$Debug,
+    [switch]$Clean,
+    [switch]$Verbose,
+    [switch]$Wasm,
+    [switch]$Help
+)
+
 # Set strict mode to catch errors
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -16,15 +25,6 @@ if (-not $Cores -or $Cores -le 0) {
     # Default to 2 cores if detection fails
     $Cores = 2
 }
-
-# Parse command line arguments
-param(
-    [switch]$Debug,
-    [switch]$Clean,
-    [switch]$Verbose,
-    [switch]$Wasm,
-    [switch]$Help
-)
 
 # Set build type based on parameters
 $BuildType = if ($Debug) { "Debug" } else { "Release" }
