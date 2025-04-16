@@ -198,13 +198,25 @@ elseif(WIN32)
     )
 
     if(PLATFORM_ARCH STREQUAL "arm64")
-        target_link_libraries(pixel_pulse PRIVATE
-            ${SDL_ROOT}/SDL3-arm64.lib
-        )
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            target_link_libraries(pixel_pulse PRIVATE
+                ${SDL_ROOT}/SDL3-arm64-Debug.lib
+            )
+        else()
+            target_link_libraries(pixel_pulse PRIVATE
+                ${SDL_ROOT}/SDL3-arm64.lib
+            )
+        endif()
     else()
-        target_link_libraries(pixel_pulse PRIVATE
-            ${SDL_ROOT}/SDL3-x86_64.lib
-        )
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            target_link_libraries(pixel_pulse PRIVATE
+                ${SDL_ROOT}/SDL3-x86_64-Debug.lib
+            )
+        else()
+            target_link_libraries(pixel_pulse PRIVATE
+                ${SDL_ROOT}/SDL3-x86_64.lib
+            )
+        endif()
     endif()
 elseif(EMSCRIPTEN)
     set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/release-${SDL_VERSION}/wasm-wasm32/static)
