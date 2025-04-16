@@ -167,6 +167,15 @@ if(APPLE)
         ${SDL_ROOT}/libSDL3-universal.a
         ${SDL_FRAMEWORKS}
     )
+
+    set_target_properties(pixel_pulse PROPERTIES
+        DEBUG_OUTPUT_NAME "pixel_pulse-Debug"
+    )
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_options(pixel_pulse PRIVATE -fsanitize=address)
+        target_link_options(pixel_pulse PRIVATE -fsanitize=address)
+    endif()
 elseif(WIN32)
     set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/release-${SDL_VERSION}/windows-universal/static)
 
@@ -226,6 +235,10 @@ include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/external/stb/master)
 # Build type
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_definitions(pixel_pulse PRIVATE APP_DEBUG=1)
 endif()
 
 # Aggressive compiler warnings and modern C++ enforcement

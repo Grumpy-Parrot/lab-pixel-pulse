@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GP_PLATFORM_API_H
-#define GP_PLATFORM_API_H
+#ifndef PIXELPULSE_PLATFORM_API_H
+#define PIXELPULSE_PLATFORM_API_H
 
 #ifdef PLATFORM_WASM
 #include <emscripten/emscripten.h>
@@ -22,5 +22,7 @@
 #include <Cocoa/Cocoa.h>
 #endif
 #endif
+
+#include "String.h"
 
 #endif

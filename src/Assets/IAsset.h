@@ -1,18 +1,40 @@
 #pragma once
 
-#ifndef GP_IASSET_H
-#define GP_IASSET_H
+#ifndef PIXELPULSE_IASSET_H
+#define PIXELPULSE_IASSET_H
 
-class IAsset
+#include "../Logger.h"
+
+namespace PixelPulse::Assets
 {
-public:
-    virtual ~IAsset() = default;
+    class AssetRegistry;
 
-    virtual void initalize(const char* path) = 0;
-    virtual bool load() = 0;
-    virtual void unload() = 0;
-    virtual bool isLoaded() const = 0;
-    virtual const char *getName() const = 0;
-};
+    class IAsset
+    {
+    public:
+        AssetRegistry *m_registry = nullptr;
+
+        virtual ~IAsset();
+
+        const char *getId() const { return m_id; }
+        const char *getPath() const { return m_path; }
+        const char *getPathAbsolute() const { return m_pathAbsolute; }
+
+        virtual void initialize(const char *path);
+        virtual bool load() = 0;
+        virtual void unload() = 0;
+        virtual bool isLoaded() const = 0;
+        virtual const char *getName() const = 0;
+
+        void retain();
+        void release();
+
+    protected:
+        int m_refCount = 1;
+        const char *m_path = nullptr;
+        const char *m_pathAbsolute = nullptr;
+        const char *m_id = nullptr;
+    };
+}
 
 #endif

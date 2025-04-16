@@ -1,4 +1,7 @@
+#include "IAsset.h"
 #include "AssetRegistry.h"
+
+using namespace PixelPulse::Assets;
 
 AssetRegistry::AssetRegistry()
 {
@@ -6,16 +9,20 @@ AssetRegistry::AssetRegistry()
 
 AssetRegistry::~AssetRegistry()
 {
-    unloadAllAssets();
+    if (!m_assets.empty())
+    {
+        Logger::warning("AssetRegistry is being destroyed with %zu assets still registered", m_assets.size());
+        flushActiveQueue();
+    }
 
-    for (auto asset : assets)
+    for (auto asset : m_assets)
     {
         delete asset;
     }
-    assets.clear();
+    m_assets.clear();
 }
 
-void AssetRegistry::registerAsset(IAsset *asset)
+void AssetRegistry::add(IAsset *asset)
 {
     if (!asset)
     {
@@ -23,35 +30,69 @@ void AssetRegistry::registerAsset(IAsset *asset)
         return;
     }
 
-    auto it = std::find(assets.begin(), assets.end(), asset);
-    if (it != assets.end())
+    auto it = std::find(m_assets.begin(), m_assets.end(), asset);
+    if (it != m_assets.end())
     {
         Logger::warning("Asset already registered");
         return;
     }
 
-    assets.push_back(asset);
+    asset->m_registry = this;
+
+    m_assets.push_back(asset);
     Logger::info("Asset registered: %s", asset->getName());
 }
 
-void AssetRegistry::unregisterAsset(IAsset *asset)
+void AssetRegistry::remove(IAsset *asset)
 {
+    Logger::debug("Removing asset '%s' (%s)", asset->getName(), asset->getId());
+
+    if (!asset)
+    {
+        Logger::error("Attempted to remove a null asset");
+        return;
+    }
+
+    auto it = std::find(m_assets.begin(), m_assets.end(), asset);
+    if (it != m_assets.end())
+    {
+        m_assets.erase(it);
+
+        auto unloadIt = std::find(m_assetsUnloadQueue.begin(), m_assetsUnloadQueue.end(), asset);
+        if (unloadIt != m_assetsUnloadQueue.end())
+        {
+            Logger::warning("Asset '%s (%s)' is already in the unload queue", asset->getName(), asset->getId());
+            return;
+        }
+
+        m_assetsUnloadQueue.push_back(asset);
+
+        Logger::info("Asset '%s (%s)' put on unload queue", asset->getName(), asset->getId());
+    }
+    else
+    {
+        Logger::warning("Attempted to unregister an asset that is not registered");
+    }
+}
+
+void AssetRegistry::removeImmediately(IAsset *asset)
+{
+    Logger::debug("Unregistering asset without waiting: %s", asset->getName());
+
     if (!asset)
     {
         Logger::error("Attempted to unregister a null asset");
         return;
     }
 
-    // Find and remove the asset
-    auto it = std::find(assets.begin(), assets.end(), asset);
-    if (it != assets.end())
+    auto it = std::find(m_assets.begin(), m_assets.end(), asset);
+    if (it != m_assets.end())
     {
-        // Ensure the asset is unloaded before removing
         if ((*it)->isLoaded())
         {
             (*it)->unload();
         }
-        assets.erase(it);
+        m_assets.erase(it);
         Logger::info("Asset unregistered: %s", asset->getName());
     }
     else
@@ -60,37 +101,28 @@ void AssetRegistry::unregisterAsset(IAsset *asset)
     }
 }
 
-void AssetRegistry::loadAllAssets()
+void AssetRegistry::flushUnloadQueue()
 {
-    Logger::info("Loading all assets...");
-    int loadedCount = 0;
-    int failedCount = 0;
+    Logger::info("Flushing unload queue...");
 
-    for (auto asset : assets)
+    for (auto asset : m_assetsUnloadQueue)
     {
-        if (!asset->isLoaded())
+        if (asset->isLoaded())
         {
-            if (asset->load())
-            {
-                loadedCount++;
-            }
-            else
-            {
-                failedCount++;
-                Logger::error("Failed to load asset: %s", asset->getName());
-            }
+            asset->unload();
         }
     }
 
-    Logger::info("Asset loading complete. Loaded: %d, Failed: %d", loadedCount, failedCount);
+    m_assetsUnloadQueue.clear();
+    Logger::info("Unload queue flushed");
 }
 
-void AssetRegistry::unloadAllAssets()
+void AssetRegistry::flushActiveQueue()
 {
     Logger::info("Unloading all assets...");
     int unloadedCount = 0;
 
-    for (auto asset : assets)
+    for (auto asset : m_assets)
     {
         if (asset->isLoaded())
         {
@@ -100,4 +132,34 @@ void AssetRegistry::unloadAllAssets()
     }
 
     Logger::info("Asset unloading complete. Unloaded: %d", unloadedCount);
+}
+
+IAsset *AssetRegistry::findAsset(const char *path)
+{
+    for (auto asset : m_assets)
+    {
+        if (strcmp(asset->getPath(), path) == 0)
+        {
+            return asset;
+        }
+    }
+
+    for (auto asset : m_assetsUnloadQueue)
+    {
+        if (strcmp(asset->getPath(), path) == 0)
+        {
+            // If the asset is in the unload queue, move it to the active list
+            auto it = std::find(m_assetsUnloadQueue.begin(), m_assetsUnloadQueue.end(), asset);
+            if (it != m_assetsUnloadQueue.end())
+            {
+                m_assetsUnloadQueue.erase(it);
+                m_assets.push_back(asset);
+                Logger::info("Asset '%s (%s)' moved from unload queue to active list", asset->getName(), asset->getId());
+            }
+
+            return asset;
+        }
+    }
+
+    return nullptr;
 }

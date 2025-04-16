@@ -104,6 +104,12 @@ mkdir -p bin/$PLATFORM-$ARCH/shaders
 # Configure with CMake
 echo "Configuring build for $PLATFORM-$ARCH..."
 
+BINARY_NAME="pixel_pulse"
+
+if [ "$BUILD_TYPE" == "Debug" ]; then
+    BINARY_NAME="$BINARY_NAME-Debug"
+fi
+
 if [ "$USE_WASM" == "true" ]; then
     # Check if emcc and emcmake are available
     if ! command -v emcc &> /dev/null || ! command -v emcmake &> /dev/null; then
@@ -147,6 +153,11 @@ else
 
     # Run the native build
     cmake $BUILD_ARGS
+
+    if [ "$PLATFORM" == "macos" ] && [ "$BUILD_TYPE" == "Debug" ]; then
+        echo "Re-signing executable for profiling (get-task-allow)..."
+        codesign -s - --entitlements "$SCRIPT_DIR/macos.debug.entitlements" -f "bin/$PLATFORM-$ARCH/$BINARY_NAME"
+    fi
 fi
 
 # Output final path
@@ -154,5 +165,5 @@ echo "Build complete!"
 if [ "$USE_WASM" == "true" ]; then
     echo "WebAssembly output location: bin/$PLATFORM-$ARCH/pixel_pulse.js and bin/$PLATFORM-$ARCH/pixel_pulse.wasm"
 else
-    echo "Binary location: bin/$PLATFORM-$ARCH/pixel_pulse"
+    echo "Binary location: bin/$PLATFORM-$ARCH/$BINARY_NAME"
 fi

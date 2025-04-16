@@ -1,39 +1,37 @@
 #pragma once
 
-#ifndef GP_SPRITE_H
-#define GP_SPRITE_H
+#ifndef PIXELPULSE_SPRITE_H
+#define PIXELPULSE_SPRITE_H
 
 #include "../Libraries/Libraries.h"
 #include "../Assets/Image.h"
-#include "../RenderPassDescriptor.h"
+#include "../Game/RenderPassDescriptor.h"
 #include "../Math/Vector2.h"
-#include "UpdateEventPayload.h"
+#include "Events/UpdateEventPayload.h"
 
-class Sprite
+namespace PixelPulse::Game
 {
-private:
-    Image *image;
-    SDL_Texture *texture;
+    using namespace PixelPulse::Assets;
+    using namespace PixelPulse::Game::Events;
 
-    Vector2<std::int32_t> m_originalSize;
-    Vector2<float> m_position;
-    Vector2<float> m_scale;
+    class SceneNode;
 
-public:
-    Sprite(Image *img);
-    ~Sprite();
+    class Sprite
+    {
+    private:
+        Image *m_image;
+        SDL_Texture *m_texture;
+        Math::Vector2<std::int32_t> m_originalSize;
 
-    bool init(SDL_Renderer *renderer);
+    public:
+        Sprite(Image *image);
+        virtual ~Sprite();
 
-    void onUpdate(UpdateEventPayload payload);
-
-    void move(Vector2<float> to);
-
-    void scale(Vector2<float> factor);
-
-    void render(SDL_Renderer *renderer, RenderPassDescriptor *renderPassDescriptor);
-
-    float getScalingFactor(int windowWidth, int windowHeight) const;
-};
+        bool init(SDL_Renderer *renderer);
+        void onUpdate(const Events::UpdateEventPayload payload);
+        void render(SDL_Renderer *renderer, const RenderPassDescriptor *renderPassDescriptor, const Math::Vector2<float> &worldPosition, const Math::Vector2<float> &worldScale);
+        float getScalingFactor(int windowWidth, int windowHeight) const;
+    };
+}
 
 #endif

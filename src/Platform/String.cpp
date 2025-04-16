@@ -1,6 +1,8 @@
-#include "StringTools.h"
+#include "String.h"
 
-char *CString::join(const char *a, const char *b)
+using namespace PixelPulse::Platform;
+
+char *String::join(const char *a, const char *b)
 {
     if (!a)
     {
@@ -12,9 +14,9 @@ char *CString::join(const char *a, const char *b)
         b = "";
     }
 
-    size_t len_a = std::strlen(a);
-    size_t len_b = std::strlen(b);
-    size_t total_len = len_a + len_b + 1; // +1 for null terminator
+    std::size_t len_a = std::strlen(a);
+    std::size_t len_b = std::strlen(b);
+    std::size_t total_len = len_a + len_b + 1; // +1 for null terminator
 
     char *result = (char *)std::malloc(total_len);
     if (!result)

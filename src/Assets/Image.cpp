@@ -1,9 +1,16 @@
-#include "Image.h"
 #include "Logger.h"
 #include "Platform/Platform.h"
-#include "StringTools.h"
+#include "Platform/String.h"
+#include "Image.h"
 
-Image::Image() : width(0), height(0), channels(0), data(nullptr), pathAbsolute(nullptr) {}
+using namespace PixelPulse::Assets;
+
+Image::Image() : width(0),
+                 height(0),
+                 channels(0),
+                 data(nullptr)
+{
+}
 
 Image::~Image()
 {
@@ -11,20 +18,11 @@ Image::~Image()
     {
         stbi_image_free(data);
     }
-    if (pathAbsolute)
-    {
-        std::free((void *)pathAbsolute);
-    }
-}
-
-void Image::initalize(const char *path)
-{
-    const char *appPath = SDL_GetBasePath();
-    pathAbsolute = CString::join(appPath, path);
 }
 
 bool Image::load()
 {
+    const char *pathAbsolute = getPathAbsolute();
     data = stbi_load(pathAbsolute, &width, &height, &channels, 4); // Force RGBA
 
     if (!data)
@@ -46,7 +44,10 @@ void Image::unload()
     {
         stbi_image_free(data);
         data = nullptr;
-        Logger::info("Unloaded image: %s", pathAbsolute);
+    }
+    else
+    {
+        Logger::warning("Image already unloaded: %s", getPath());
     }
 }
 
