@@ -5,15 +5,14 @@
 #include "Libraries/Libraries.h"
 
 #include "Assets/AssetRegistry.h"
-#include "Assets/Image.h"
-#include "Game/Sprite.h"
 #include "Game/RenderPassDescriptor.h"
 #include "Math/Vector2.h"
 #include "Game/Input.h"
-#include "Game/Events/UpdateEventPayload.h"
-#include "Game/Events/AttachEventPayload.h"
 #include "Game/Scene.h"
 #include "Game/SceneNode.h"
+#include "Game/Events/UpdateEventPayload.h"
+#include "Game/Events/AttachEventPayload.h"
+
 #include "Entities/PlayerEntity.h"
 
 namespace PixelPulse
