@@ -1,76 +1,58 @@
 #include "Sprite.h"
 #include "../Logger.h"
 
-Sprite::Sprite(Image *img) : image(img),
-                             texture(nullptr),
-                             m_originalSize(0, 0),
-                             m_position(0, 0) {}
+using namespace PixelPulse::Game;
+
+Sprite::Sprite(Image *image)
+    : m_image(image),
+      m_texture(nullptr),
+      m_originalSize(0, 0)
+{
+}
 
 Sprite::~Sprite()
 {
-    if (texture)
+    if (m_texture)
     {
-        SDL_DestroyTexture(texture);
+        SDL_DestroyTexture(m_texture);
+        m_texture = nullptr;
+    }
+
+    if (m_image)
+    {
+        m_image->release();
+        m_image = nullptr;
     }
 }
 
 bool Sprite::init(SDL_Renderer *renderer)
 {
-    if (!image || !image->data)
+    if (!m_image || !m_image->data)
     {
         Logger::error("Image data is null");
         return false;
     }
 
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC,
-                                image->width, image->height);
-    if (!texture)
+    m_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC,
+                                m_image->width, m_image->height);
+    if (!m_texture)
     {
         Logger::error("Failed to create texture: %s", SDL_GetError());
         return false;
     }
 
-    m_originalSize.x = image->width;
-    m_originalSize.y = image->height;
+    m_image->retain();
 
-    SDL_UpdateTexture(texture, nullptr, image->data, image->width * 4);
+    m_originalSize.x = m_image->width;
+    m_originalSize.y = m_image->height;
+
+    SDL_UpdateTexture(m_texture, nullptr, m_image->data, m_image->width * 4);
     return true;
 }
 
-void Sprite::onUpdate(UpdateEventPayload payload)
+void Sprite::onUpdate(const UpdateEventPayload payload)
 {
-    float deltaTime = payload.deltaTime;
-    Input *input = payload.input;
-
-    if (input->isKeyPressed(KeyCode::KEY_W))
-    {
-        m_position.y -= 100.0f * deltaTime;
-    }
-
-    if (input->isKeyPressed(KeyCode::KEY_S))
-    {
-        m_position.y += 100.0f * deltaTime;
-    }
-
-    if (input->isKeyPressed(KeyCode::KEY_A))
-    {
-        m_position.x -= 100.0f * deltaTime;
-    }
-
-    if (input->isKeyPressed(KeyCode::KEY_D))
-    {
-        m_position.x += 100.0f * deltaTime;
-    }
-}
-
-void Sprite::move(Vector2<float> to)
-{
-    m_position = to;
-}
-
-void Sprite::scale(Vector2<float> factor)
-{
-    m_scale = factor;
+    (void)payload; // Unused for now
 }
 
 float Sprite::getScalingFactor(int windowWidth, int windowHeight) const
@@ -83,24 +65,26 @@ float Sprite::getScalingFactor(int windowWidth, int windowHeight) const
     return std::min(widthRatio, heightRatio);
 }
 
-void Sprite::render(SDL_Renderer *renderer, RenderPassDescriptor *renderPassDescriptor)
+void Sprite::render(SDL_Renderer *renderer, const RenderPassDescriptor *renderPassDescriptor, const Math::Vector2<float> &worldPosition, const Math::Vector2<float> &worldScale)
 {
-    if (texture)
+    if (m_texture)
     {
         float scaleFactor = getScalingFactor(renderPassDescriptor->windowSize.x, renderPassDescriptor->windowSize.y);
 
-        float scaledWidth = static_cast<float>(m_originalSize.x) * scaleFactor;
-        float scaledHeight = static_cast<float>(m_originalSize.y) * scaleFactor;
+        // Use world scale passed in
+        float scaledWidth = static_cast<float>(m_originalSize.x) * scaleFactor * worldScale.x;
+        float scaledHeight = static_cast<float>(m_originalSize.y) * scaleFactor * worldScale.y;
 
-        float scaledX = m_position.x * scaleFactor;
-        float scaledY = m_position.y * scaleFactor;
+        // Use world position passed in
+        float scaledX = worldPosition.x * scaleFactor;
+        float scaledY = worldPosition.y * scaleFactor;
 
         SDL_FRect dstRect;
         dstRect.x = scaledX;
         dstRect.y = scaledY;
-        dstRect.w = scaledWidth * m_scale.x;
-        dstRect.h = scaledHeight * m_scale.y;
+        dstRect.w = scaledWidth;
+        dstRect.h = scaledHeight;
 
-        SDL_RenderTexture(renderer, texture, nullptr, &dstRect);
+        SDL_RenderTexture(renderer, m_texture, nullptr, &dstRect);
     }
 }

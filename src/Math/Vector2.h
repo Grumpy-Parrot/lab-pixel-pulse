@@ -1,34 +1,83 @@
 #pragma once
 
-#ifndef GP_VECTOR2_H
-#define GP_VECTOR2_H
+#ifndef PIXELPULSE_VECTOR2_H
+#define PIXELPULSE_VECTOR2_H
 
-template<typename T = float>
-struct Vector2
+#include "../Platform/Std.h"
+
+namespace PixelPulse::Math
 {
-    T x;
-    T y;
-
-    Vector2(T x = T(0), T y = T(0)) : x(x), y(y) {}
-
-    Vector2<T> operator+(const Vector2<T> &other) const
+    template <typename T = float>
+    struct Vector2
     {
-        return Vector2<T>(x + other.x, y + other.y);
+        T x;
+        T y;
+
+        Vector2(T x = T(0), T y = T(0)) : x(x), y(y) {}
+
+        Vector2<T> operator+(const Vector2<T> &other) const
+        {
+            return Vector2<T>(x + other.x, y + other.y);
+        }
+
+        Vector2<T> operator-(const Vector2<T> &other) const
+        {
+            return Vector2<T>(x - other.x, y - other.y);
+        }
+
+        Vector2<T> operator*(T scalar) const
+        {
+            return Vector2<T>(x * scalar, y * scalar);
+        }
+
+        Vector2<T> operator*(const Vector2<T> &other) const
+        {
+            return Vector2<T>(x * other.x, y * other.y);
+        }
+
+        Vector2<T> operator/(T scalar) const
+        {
+            return Vector2<T>(x / scalar, y / scalar);
+        }
+
+        Vector2<T> &operator+=(const Vector2<T> &other)
+        {
+            x += other.x;
+            y += other.y;
+            return *this;
+        }
+
+        Vector2<T> &operator+=(const Vector2<T> &other)
+        {
+            x += other.x;
+            y += other.y;
+            return *this;
+        }
+
+        bool operator==(const Vector2<T> &other) const
+    {
+        return (x == other.x && y == other.y);
     }
 
-    Vector2<T> operator-(const Vector2<T> &other) const
+    bool operator!=(const Vector2<T> &other) const
     {
-        return Vector2<T>(x - other.x, y - other.y);
+        return !(*this == other);
     }
 
-    Vector2<T> operator*(T scalar) const
+    T length() const
     {
-        return Vector2<T>(x * scalar, y * scalar);
+        return std::sqrt(x * x + y * y);
     }
 
-    Vector2<T> operator/(T scalar) const
+    Vector2<T> normalize() const
     {
-        return Vector2<T>(x / scalar, y / scalar);
+        T len = length();
+        if (len == T(0))
+        {
+            return Vector2<T>(0, 0);
+        }
+
+        return Vector2<T>(x / len, y / len);
     }
 
     bool operator==(const Vector2<T> &other) const

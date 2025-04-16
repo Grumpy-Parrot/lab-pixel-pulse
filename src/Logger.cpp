@@ -5,6 +5,8 @@
 #define ANSI_COLOR_BLUE "\x1b[34m"
 #define ANSI_COLOR_RESET "\x1b[0m"
 
+using namespace PixelPulse;
+
 Logger::Level Logger::currentLevel = Logger::Level::Info;
 
 void Logger::setLevel(Level level)

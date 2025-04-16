@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef GP_PLATFORM_STD_H
-#define GP_PLATFORM_STD_H
+#ifndef PIXELPULSE_PLATFORM_STD_H
+#define PIXELPULSE_PLATFORM_STD_H
 
 #include <cstdarg>
 #include <cstdio>
@@ -11,5 +11,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+
+#define PIXELPULSE_ARG_UNUSED(x) (void)(x)
 
 #endif

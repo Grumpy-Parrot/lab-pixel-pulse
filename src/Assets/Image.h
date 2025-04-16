@@ -1,29 +1,30 @@
 #pragma once
 
-#ifndef GP_IMAGE_H
-#define GP_IMAGE_H
+#ifndef PIXELPULSE_IMAGE_H
+#define PIXELPULSE_IMAGE_H
 
-#include "Libraries/Libraries.h"
+#include "../Libraries/stb.h"
 #include "Platform/Std.h"
 #include "IAsset.h"
 
-class Image : public IAsset
+namespace PixelPulse::Assets
 {
-public:
-    int width;
-    int height;
-    int channels;
-    unsigned char* data;
-    const char* pathAbsolute;
+    class Image : public IAsset
+    {
+    public:
+        std::int32_t width;
+        std::int32_t height;
+        std::int32_t channels;
+        unsigned char *data;
 
-    Image();
-    ~Image();
+        Image();
+        virtual ~Image();
 
-    const char* getName() const override { return "Image"; }
-    bool load() override;
-    void unload() override;
-    bool isLoaded() const override;
-    void initalize(const char* path) override;
-};
+        const char *getName() const override { return "Image"; }
+        bool load() override;
+        void unload() override;
+        bool isLoaded() const override;
+    };
+}
 
 #endif
