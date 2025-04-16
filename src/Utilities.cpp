@@ -42,7 +42,7 @@ const char* PIXELPULSE_deriveId(const char* in, size_t length)
     for (size_t i = 0; i < length; ++i)
     {
         id[i] = charset[hash % charset_size];
-        if (charset_size > 0) {
+        if constexpr (charset_size > 0) {
              hash /= charset_size;
         } else {
              hash = 0;

@@ -47,73 +47,41 @@ namespace PixelPulse::Math
             return *this;
         }
 
-        Vector2<T> &operator+=(const Vector2<T> &other)
+        Vector2<T> normalize() const
         {
-            x += other.x;
-            y += other.y;
-            return *this;
+            T len = length();
+            if (len == T(0))
+            {
+                return Vector2<T>(0, 0);
+            }
+
+            return Vector2<T>(x / len, y / len);
         }
 
         bool operator==(const Vector2<T> &other) const
-    {
-        return (x == other.x && y == other.y);
-    }
-
-    bool operator!=(const Vector2<T> &other) const
-    {
-        return !(*this == other);
-    }
-
-    T length() const
-    {
-        return std::sqrt(x * x + y * y);
-    }
-
-    Vector2<T> normalize() const
-    {
-        T len = length();
-        if (len == T(0))
         {
-            return Vector2<T>(0, 0);
+            return (x == other.x && y == other.y);
         }
 
-        return Vector2<T>(x / len, y / len);
-    }
-
-    bool operator==(const Vector2<T> &other) const
-    {
-        return (x == other.x && y == other.y);
-    }
-
-    bool operator!=(const Vector2<T> &other) const
-    {
-        return !(*this == other);
-    }
-
-    T length() const
-    {
-        return std::sqrt(x * x + y * y);
-    }
-
-    Vector2<T> normalize() const
-    {
-        T len = length();
-        if (len == T(0))
+        bool operator!=(const Vector2<T> &other) const
         {
-            return Vector2<T>(0, 0);
+            return !(*this == other);
         }
 
-        return Vector2<T>(x / len, y / len);
-    }
+        T length() const
+        {
+            return std::sqrt(x * x + y * y);
+        }
 
-    using Float = Vector2<float>;
-    using Double = Vector2<double>;
-    using Int16 = Vector2<std::int16_t>;
-    using Int32 = Vector2<std::int32_t>;
-    using Int64 = Vector2<std::int64_t>;
-    using UInt16 = Vector2<std::uint16_t>;
-    using UInt32 = Vector2<std::uint32_t>;
-    using UInt64 = Vector2<std::uint64_t>;
-};
+        using Float = Vector2<float>;
+        using Double = Vector2<double>;
+        using Int16 = Vector2<std::int16_t>;
+        using Int32 = Vector2<std::int32_t>;
+        using Int64 = Vector2<std::int64_t>;
+        using UInt16 = Vector2<std::uint16_t>;
+        using UInt32 = Vector2<std::uint32_t>;
+        using UInt64 = Vector2<std::uint64_t>;
+    };
+}
 
 #endif
