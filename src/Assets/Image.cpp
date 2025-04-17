@@ -22,8 +22,14 @@ Image::~Image()
 
 bool Image::load()
 {
+    if(data)
+    {
+        Logger::warning("Image data are already loaded: %s", getPath());
+        return true;
+    }
+
     const char *pathAbsolute = getPathAbsolute();
-    data = stbi_load(pathAbsolute, &width, &height, &channels, 4); // Force RGBA
+    data = stbi_load(pathAbsolute, &width, &height, &channels, 4);
 
     if (!data)
     {

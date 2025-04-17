@@ -97,7 +97,7 @@ void AssetRegistry::removeImmediately(IAsset *asset)
     }
     else
     {
-        Logger::warning("Attempted to unregister an asset that is not registered");
+        Logger::warning("Attempted to unregister an asset immediately that is not registered");
     }
 }
 

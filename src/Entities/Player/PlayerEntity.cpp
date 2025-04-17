@@ -1,11 +1,10 @@
 #include "PlayerEntity.h"
-#include "../Game/SceneNode.h"
-#include "../Game/Events/UpdateEventPayload.h"
-#include "../Game/Input.h"
-#include "../Platform/Platform.h"
-#include "../Assets/Image.h"
-#include "../Game/Sprite.h"
-#include "../Game/EntityLibrary.h"
+#include "../../Game/SceneNode.h"
+#include "../../Game/Events/UpdateEventPayload.h"
+#include "../../Game/Input.h"
+#include "../../Assets/Image.h"
+#include "../../Game/Sprite.h"
+#include "../../Game/EntityLibrary.h"
 
 using namespace PixelPulse::Entities;
 using namespace PixelPulse::Game;
@@ -59,9 +58,6 @@ void PlayerEntity::onAttach(SceneNode *ownerNode, const AttachEventPayload &payl
         Logger::error("Failed to initialize sprite");
         return;
     }
-
-    // We don't need to retain the image here, as the sprite will take care of it
-    vampireImage->release();
 
     ownerNode->setSprite(vampireSprite);
     ownerNode->m_position = Math::Vector2<float>(100, 100);

@@ -250,7 +250,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(pixel_pulse PRIVATE APP_DEBUG=1 PIXELPULSE_TRACK_MEMORY=1)
+    target_compile_definitions(pixel_pulse PRIVATE PIXELPULSE_DEBUG=1 PIXELPULSE_TRACK_MEMORY=1)
 endif()
 
 # Aggressive compiler warnings and modern C++ enforcement

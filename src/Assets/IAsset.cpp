@@ -37,11 +37,13 @@ void IAsset::initialize(const char *path)
 void IAsset::retain()
 {
     m_refCount++;
+    Logger::debug("Asset '%s' (%s) retained, new ref count: %d", getName(), getId(), m_refCount);
 }
 
 void IAsset::release()
 {
     m_refCount--;
+    Logger::debug("Asset '%s' (%s) released, new ref count: %d", getName(), getId(), m_refCount);
     if (m_refCount <= 0)
     {
         Logger::debug("Asset '%s' (%s) reached zero reference count, unregistering", getName(), getId());

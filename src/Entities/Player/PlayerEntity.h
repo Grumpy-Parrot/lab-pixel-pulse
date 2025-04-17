@@ -3,9 +3,9 @@
 #ifndef PIXELPULSE_PLAYERENTITY_H
 #define PIXELPULSE_PLAYERENTITY_H
 
-#include "../Platform/Std.h"
-#include "../Game/IEntity.h"
-#include "../Math/Vector2.h"
+#include "../../Platform/Std.h"
+#include "../../Game/IEntity.h"
+#include "../../Math/Vector2.h"
 
 namespace PixelPulse::Entities
 {
@@ -22,7 +22,7 @@ namespace PixelPulse::Entities
         void onAttach(Game::SceneNode *ownerNode, const Game::Events::AttachEventPayload &payload) override;
         void onDetach(Game::SceneNode *ownerNode) override;
 
-        Game::EntityID getID() const override
+        static Game::EntityID getID()
         {
             return "PlayerEntity";
         }

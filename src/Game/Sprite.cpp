@@ -20,6 +20,7 @@ Sprite::~Sprite()
 
     if (m_image)
     {
+        Logger::debug("Sprite is releasing image '%s' (%s)", m_image->getName(), m_image->getId());
         m_image->release();
         m_image = nullptr;
     }
@@ -33,8 +34,7 @@ bool Sprite::init(SDL_Renderer *renderer)
         return false;
     }
 
-    m_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC,
-                                m_image->width, m_image->height);
+    m_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, m_image->width, m_image->height);
     if (!m_texture)
     {
         Logger::error("Failed to create texture: %s", SDL_GetError());
@@ -85,6 +85,7 @@ void Sprite::render(SDL_Renderer *renderer, const RenderPassDescriptor *renderPa
         dstRect.w = scaledWidth;
         dstRect.h = scaledHeight;
 
+        SDL_SetTextureBlendMode(m_texture, SDL_BLENDMODE_BLEND);
         SDL_RenderTexture(renderer, m_texture, nullptr, &dstRect);
     }
 }

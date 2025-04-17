@@ -31,7 +31,7 @@ namespace PixelPulse::Assets
         void release();
 
     protected:
-        int m_refCount = 1;
+        int m_refCount = 0;
         const char *m_path = nullptr;
         const char *m_pathAbsolute = nullptr;
         const char *m_id = nullptr;

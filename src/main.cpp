@@ -14,8 +14,6 @@
 #include "Game/Events/UpdateEventPayload.h"
 #include "Game/Events/AttachEventPayload.h"
 
-#include "Entities/PlayerEntity.h"
-
 namespace PixelPulse
 {
     class Application
@@ -88,7 +86,7 @@ namespace PixelPulse
 
         bool initialize(const char *title, int width, int height)
         {
-#ifdef APIXELPULSE_DEBUG
+#ifdef PIXELPULSE_DEBUG
             Logger::setLevel(Logger::Level::Debug);
 #else
             Logger::setLevel(Logger::Level::Info);
@@ -159,7 +157,7 @@ namespace PixelPulse
             m_scene->update(updateEventPayload);
 
             // Render
-            SDL_SetRenderDrawColor(m_renderer, 124, 0, 0, 255);
+            SDL_SetRenderDrawColor(m_renderer, 100, 149, 237, 255); // Cornflower blue background
             SDL_RenderClear(m_renderer);
 
             Game::RenderPassDescriptor renderPassDescriptor;

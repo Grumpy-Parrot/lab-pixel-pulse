@@ -102,7 +102,7 @@ namespace PixelPulse::Game
     {                                                                               \
         static bool EntityClass##_registered =                                      \
             PixelPulse::Game::EntityLibrary::getInstance().registerEntity(          \
-                #EntityClass,                                                       \
+                EntityClass::getID(),                                               \
                 []() -> PixelPulse::Game::IEntity * { return PP_NEW(EntityClass); }); \
     }
 }

@@ -6,6 +6,20 @@
       "scale": { "x": 0.2, "y": 0.2 },
       "rotation": 0,
       "tag": "player"
+    },
+    {
+      "type": "EnemyEntity1",
+      "position": { "x": 600, "y": 500 },
+      "scale": { "x": 0.25, "y": 0.25 },
+      "rotation": 0,
+      "tag": "enemy1"
+    },
+    {
+      "type": "EnemyEntity1",
+      "position": { "x": 700, "y": 200 },
+      "scale": { "x": 0.25, "y": 0.25 },
+      "rotation": 0,
+      "tag": "enemy2"
     }
   ]
 }
