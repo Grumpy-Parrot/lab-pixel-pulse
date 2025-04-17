@@ -3,6 +3,7 @@
 #ifndef PIXELPULSE_SCENENODE_H
 #define PIXELPULSE_SCENENODE_H
 
+#include "../Platform/Std.h"
 #include "../Math/Vector2.h"
 #include "Events/UpdateEventPayload.h"
 #include "IEntity.h"

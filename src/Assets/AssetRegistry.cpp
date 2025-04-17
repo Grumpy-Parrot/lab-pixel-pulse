@@ -1,5 +1,5 @@
-#include "IAsset.h"
 #include "AssetRegistry.h"
+#include "IAsset.h"
 
 using namespace PixelPulse::Assets;
 
@@ -17,7 +17,7 @@ AssetRegistry::~AssetRegistry()
 
     for (auto asset : m_assets)
     {
-        delete asset;
+        PP_DELETE(asset);
     }
     m_assets.clear();
 }

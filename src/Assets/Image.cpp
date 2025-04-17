@@ -1,7 +1,7 @@
+#include "Image.h"
 #include "Logger.h"
 #include "Platform/Platform.h"
 #include "Platform/String.h"
-#include "Image.h"
 
 using namespace PixelPulse::Assets;
 

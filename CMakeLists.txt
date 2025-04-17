@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(PixelPulse VERSION 1.0.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SDL_VERSION "3.2.10")
@@ -250,7 +250,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(pixel_pulse PRIVATE APP_DEBUG=1)
+    target_compile_definitions(pixel_pulse PRIVATE APP_DEBUG=1 PIXELPULSE_TRACK_MEMORY=1)
 endif()
 
 # Aggressive compiler warnings and modern C++ enforcement

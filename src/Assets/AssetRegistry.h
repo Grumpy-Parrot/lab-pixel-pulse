@@ -57,7 +57,7 @@ namespace PixelPulse::Assets
             }
 
             Logger::info("Asset not found, creating new one: %s", request.path);
-            T *asset = new T();
+            T *asset = PP_NEW(T);
             asset->initialize(request.path);
 
             add(asset);

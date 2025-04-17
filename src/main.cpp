@@ -1,5 +1,6 @@
 #include "Platform/Platform.h"
 #include "Platform/Std.h"
+#include "Platform/Memory.h"
 #include "Logger.h"
 #define PIXELPULSE_LIBRARIES_SHOULD_IMPLEMENT
 #include "Libraries/Libraries.h"
@@ -120,10 +121,10 @@ namespace PixelPulse
                 return false;
             }
 
-            m_assetRegistry = new Assets::AssetRegistry();
+            m_assetRegistry = PP_NEW(Assets::AssetRegistry);
 
             // Create scene graph
-            m_scene = new Game::Scene();
+            m_scene = PP_NEW(Game::Scene);
             m_scene->setRenderer(m_renderer);
             m_scene->setAssetRegistry(m_assetRegistry);
 
@@ -192,7 +193,7 @@ namespace PixelPulse
             if (m_scene)
             {
                 Logger::info("Cleaning up scene");
-                delete m_scene;
+                PP_DELETE(m_scene);
                 m_scene = nullptr;
             }
 
@@ -201,7 +202,7 @@ namespace PixelPulse
                 Logger::info("Cleaning up asset registry");
                 m_assetRegistry->flushUnloadQueue();
                 m_assetRegistry->flushActiveQueue();
-                delete m_assetRegistry;
+                PP_DELETE(m_assetRegistry);
                 m_assetRegistry = nullptr;
             }
 
@@ -232,6 +233,9 @@ int main(int argc, char *argv[])
 {
     PIXELPULSE_ARG_UNUSED(argc);
     PIXELPULSE_ARG_UNUSED(argv);
+
+    // Initialize memory system
+    PP_MemorySystemInitialize();
 
     PixelPulse::Application app;
     if (!app.initialize("Game", 800, 600))

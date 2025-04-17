@@ -3,6 +3,7 @@
 #ifndef PIXELPULSE_IASSET_H
 #define PIXELPULSE_IASSET_H
 
+#include "../Platform/Std.h"
 #include "../Logger.h"
 
 namespace PixelPulse::Assets

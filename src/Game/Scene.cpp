@@ -1,7 +1,7 @@
+#include "Scene.h"
 #include "../Logger.h"
 #include "Events/AttachEventPayload.h"
 #include "../Utilities.h"
-#include "Scene.h"
 #include "EntityLibrary.h"
 #include "SceneLoader.h"
 
@@ -9,7 +9,7 @@ using namespace PixelPulse::Game;
 
 Scene::Scene() : m_rootNode(nullptr)
 {
-    m_rootNode = new SceneNode();
+    m_rootNode = PP_NEW(SceneNode);
     m_rootNode->setTag(PIXELPULSE_MAKE_ID_DERIVED("root"));
 
     m_assetRegistry = nullptr;
@@ -20,13 +20,13 @@ Scene::~Scene()
 {
     if (m_rootNode)
     {
-        delete m_rootNode;
+        PP_DELETE(m_rootNode);
         m_rootNode = nullptr;
     }
 
     for (IEntity *entity : m_entities)
     {
-        delete entity;
+        PP_DELETE(entity);
     }
     m_entities.clear();
 }
@@ -74,7 +74,7 @@ SceneNode *Scene::spawn(IEntity *entity)
         return nullptr;
     }
 
-    SceneNode *node = new SceneNode();
+    SceneNode *node = PP_NEW(SceneNode);
     node->setTag(PIXELPULSE_MAKE_ID());
     node->setEntity(entity);
 

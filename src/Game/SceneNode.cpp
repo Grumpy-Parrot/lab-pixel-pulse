@@ -1,8 +1,8 @@
 
+#include "SceneNode.h"
 #include "Sprite.h"
 #include "../Platform/Platform.h"
 #include "../Utilities.h"
-#include "SceneNode.h"
 
 using namespace PixelPulse::Game;
 
@@ -26,7 +26,7 @@ SceneNode::~SceneNode()
 
     for (SceneNode *child : m_children)
     {
-        delete child;
+        PP_DELETE(child);
     }
     m_children.clear();
 

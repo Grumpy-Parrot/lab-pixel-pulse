@@ -15,7 +15,7 @@ namespace PixelPulse::Platform
         {
             if (str)
             {
-                std::free(str);
+                PP_FREE(str);
             }
         }
     };

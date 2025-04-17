@@ -1,5 +1,5 @@
-#include "../Logger.h"
 #include "Input.h"
+#include "../Logger.h"
 
 using namespace PixelPulse::Game;
 using namespace PixelPulse::Math;

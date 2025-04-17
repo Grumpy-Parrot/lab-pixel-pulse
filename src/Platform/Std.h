@@ -18,6 +18,8 @@
 #include <unordered_map>
 #include <string>
 
+#include "Memory.h"
+
 #define PIXELPULSE_ARG_UNUSED(x) (void)(x)
 
 #endif

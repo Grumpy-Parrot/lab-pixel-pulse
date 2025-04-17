@@ -3,6 +3,7 @@
 #ifndef PIXELPULSE_PLAYERENTITY_H
 #define PIXELPULSE_PLAYERENTITY_H
 
+#include "../Platform/Std.h"
 #include "../Game/IEntity.h"
 #include "../Math/Vector2.h"
 

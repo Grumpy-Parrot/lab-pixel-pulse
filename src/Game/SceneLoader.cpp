@@ -148,8 +148,9 @@ SceneNode *SceneLoader::parseEntity(Scene *scene, const std::string &entityJson)
 
         if (entity.contains("tag") && entity["tag"].is_string())
         {
-            char *tag = new char[entity["tag"].get<std::string>().length() + 1];
-            std::strcpy(tag, entity["tag"].get<std::string>().c_str());
+            std::string tagStr = entity["tag"].get<std::string>();
+            char *tag = PP_NEW_ARRAY(char, tagStr.length() + 1);
+            std::strcpy(tag, tagStr.c_str());
             node->setTag(tag);
         }
 

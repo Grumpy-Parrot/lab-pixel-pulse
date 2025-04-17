@@ -4,6 +4,7 @@
 #define PIXELPULSE_INPUT_H
 
 #include "../Libraries/Libraries.h"
+#include "../Platform/Std.h"
 #include "../Math/Vector2.h"
 
 namespace PixelPulse::Game

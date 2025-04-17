@@ -4,6 +4,7 @@
 #define PIXELPULSE_SPRITE_H
 
 #include "../Libraries/Libraries.h"
+#include "../Platform/Std.h"
 #include "../Assets/Image.h"
 #include "../Game/RenderPassDescriptor.h"
 #include "../Math/Vector2.h"

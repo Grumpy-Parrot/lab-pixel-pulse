@@ -1,8 +1,8 @@
+#include "IAsset.h"
 #include "../Assets/AssetRegistry.h"
 #include "../Platform/String.h"
 #include "Libraries/Libraries.h"
 #include "../Utilities.h"
-#include "IAsset.h"
 
 using namespace PixelPulse::Assets;
 
@@ -10,7 +10,7 @@ IAsset::~IAsset()
 {
     if (m_pathAbsolute)
     {
-        std::free((void *)m_pathAbsolute);
+        PP_FREE((void *)m_pathAbsolute);
         m_pathAbsolute = nullptr;
     }
 
@@ -21,7 +21,7 @@ void IAsset::initialize(const char *path)
 {
     if (m_pathAbsolute)
     {
-        std::free((void *)m_pathAbsolute);
+        PP_FREE((void *)m_pathAbsolute);
     }
 
     const char *appPath = SDL_GetBasePath();

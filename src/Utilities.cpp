@@ -5,7 +5,7 @@ const char* PIXELPULSE_allocateId(size_t length)
     static const char charset[] = "abcdefghijklmnopqrstuvwxyz0123456789";
     constexpr size_t charset_size = sizeof(charset) - 1;
 
-    char* id = (char*)std::malloc(length + 1);
+    char* id = (char*)PP_MALLOC(length + 1);
     if (!id) {
         return nullptr;
     }
@@ -28,7 +28,7 @@ const char* PIXELPULSE_deriveId(const char* in, size_t length)
     constexpr size_t charset_size = sizeof(charset) - 1;
     std::uint64_t hash = 5381; // djb2 hash initial value
 
-    char* id = (char*)std::malloc(length + 1);
+    char* id = (char*)PP_MALLOC(length + 1);
     if (!id) {
         return nullptr;
     }
@@ -57,6 +57,6 @@ void PIXELPULSE_freeId(const char* id)
 {
     if (id)
     {
-        std::free((void*)id);
+        PP_FREE((void*)id);
     }
 }

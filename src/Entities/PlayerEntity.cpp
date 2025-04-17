@@ -53,7 +53,7 @@ void PlayerEntity::onAttach(SceneNode *ownerNode, const AttachEventPayload &payl
     Image *vampireImage = assetRegistry->make<Image>(AssetMakeRequest{"assets/vampire.png"});
     vampireImage->load();
 
-    Sprite *vampireSprite = new Sprite(vampireImage);
+    Sprite *vampireSprite = PP_NEW(Sprite, vampireImage);
     if (!vampireSprite->init(payload.renderer))
     {
         Logger::error("Failed to initialize sprite");
@@ -75,7 +75,7 @@ void PlayerEntity::onDetach(SceneNode *ownerNode)
     Sprite *sprite = ownerNode->getSprite();
     if (sprite)
     {
-        delete sprite;
+        PP_DELETE(sprite);
         ownerNode->setSprite(nullptr);
     }
 }

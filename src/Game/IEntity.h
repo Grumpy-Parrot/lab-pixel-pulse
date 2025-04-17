@@ -3,6 +3,7 @@
 #ifndef PIXELPULSE_IENTITY_H
 #define PIXELPULSE_IENTITY_H
 
+#include "../Platform/Std.h"
 #include "Events/UpdateEventPayload.h"
 #include "Events/AttachEventPayload.h"
 
