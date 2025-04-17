@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <streambuf>
 
 #include <functional>
 #include <unordered_map>

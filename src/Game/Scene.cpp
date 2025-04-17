@@ -3,6 +3,7 @@
 #include "../Utilities.h"
 #include "Scene.h"
 #include "EntityLibrary.h"
+#include "SceneLoader.h"
 
 using namespace PixelPulse::Game;
 
@@ -101,4 +102,44 @@ SceneNode *Scene::spawnByID(const char *entityID)
 
     Logger::info("Spawning entity with ID: %s", entityID);
     return spawn(entity);
+}
+
+bool Scene::loadFromJSON(const char* jsonFilePath)
+{
+    if (!jsonFilePath)
+    {
+        Logger::error("Scene::loadFromJSON: JSON file path is null");
+        return false;
+    }
+
+    if (!m_renderer)
+    {
+        Logger::error("Scene::loadFromJSON: Renderer is not set");
+        return false;
+    }
+
+    if (!m_assetRegistry)
+    {
+        Logger::error("Scene::loadFromJSON: AssetRegistry is not set");
+        return false;
+    }
+
+    const char *appPath = SDL_GetBasePath();
+    char* jsonFilePathAbsolute = Platform::String::join(appPath, jsonFilePath);
+
+    SceneLoader sceneLoader;
+    bool result = sceneLoader.loadScene(this, jsonFilePathAbsolute);
+
+    if (!result)
+    {
+        Logger::error("Scene::loadFromJSON: Failed to load scene from: %s", jsonFilePathAbsolute);
+    }
+    else
+    {
+        Logger::info("Scene::loadFromJSON: Successfully loaded scene from: %s", jsonFilePathAbsolute);
+    }
+
+    Platform::String::free(jsonFilePathAbsolute);
+
+    return result;
 }

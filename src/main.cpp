@@ -20,7 +20,6 @@ namespace PixelPulse
     class Application
     {
     private:
-
         bool m_shouldQuit;
         std::uint64_t m_currentTime;
         std::uint64_t m_previousTime;
@@ -128,10 +127,13 @@ namespace PixelPulse
             m_scene->setRenderer(m_renderer);
             m_scene->setAssetRegistry(m_assetRegistry);
 
-            // Add player entity
-            Entities::PlayerEntity *playerEntity = new Entities::PlayerEntity();
-            m_scene->spawnByID(playerEntity->getID());
-            //m_scene->spawn(std::move(playerEntity));
+            // Load scene from JSON
+            if (!m_scene->loadFromJSON("assets/scenes/demo.json"))
+            {
+                Logger::error("Failed to load scene from JSON");
+                cleanup();
+                return false;
+            }
 
             return true;
         }
@@ -187,23 +189,35 @@ namespace PixelPulse
         {
             Logger::info("Cleaning up application...");
 
-            Logger::info("Removing scene");
-            delete m_scene;
+            if (m_scene)
+            {
+                Logger::info("Cleaning up scene");
+                delete m_scene;
+                m_scene = nullptr;
+            }
 
-            Logger::info("Requesting unload of all assets");
-            Logger::info("- flushing asset unload queue");
-            m_assetRegistry->flushUnloadQueue();
-            Logger::info("- flushing active asset queue");
-            m_assetRegistry->flushActiveQueue();
-            delete m_assetRegistry;
+            if (m_assetRegistry)
+            {
+                Logger::info("Cleaning up asset registry");
+                m_assetRegistry->flushUnloadQueue();
+                m_assetRegistry->flushActiveQueue();
+                delete m_assetRegistry;
+                m_assetRegistry = nullptr;
+            }
 
-            Logger::info("Destroying the SDL renderer");
-            SDL_DestroyRenderer(m_renderer);
-            m_renderer = nullptr;
+            if (m_window)
+            {
+                Logger::info("Cleaning up window");
+                SDL_DestroyWindow(m_window);
+                m_window = nullptr;
+            }
 
-            Logger::info("Destroying the SDL window");
-            SDL_DestroyWindow(m_window);
-            m_window = nullptr;
+            if (m_renderer)
+            {
+                Logger::info("Cleaning up renderer");
+                SDL_DestroyRenderer(m_renderer);
+                m_renderer = nullptr;
+            }
 
             SDL_Quit();
         }

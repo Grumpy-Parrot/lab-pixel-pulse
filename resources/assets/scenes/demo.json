@@ -1,0 +1,11 @@
+{
+  "entities": [
+    {
+      "type": "PlayerEntity",
+      "position": { "x": 100, "y": 100 },
+      "scale": { "x": 0.2, "y": 0.2 },
+      "rotation": 0,
+      "tag": "player"
+    }
+  ]
+}

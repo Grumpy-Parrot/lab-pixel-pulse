@@ -16,6 +16,8 @@ namespace PixelPulse::Game
         class AssetRegistry;
     }
 
+    class SceneLoader;
+
     class Scene
     {
     public:
@@ -32,6 +34,8 @@ namespace PixelPulse::Game
         void attach(SceneNode *node, SceneNode *parent = nullptr);
         SceneNode *spawn(IEntity *entity);
         SceneNode *spawnByID(const char *entityID);
+
+        bool loadFromJSON(const char* jsonFilePath);
 
     private:
         SDL_Renderer *m_renderer;

@@ -11,6 +11,13 @@ namespace PixelPulse::Platform
     {
     public:
         static char *join(const char *a, const char *b);
+        static void free(char *str)
+        {
+            if (str)
+            {
+                std::free(str);
+            }
+        }
     };
 }
 

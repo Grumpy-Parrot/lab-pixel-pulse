@@ -241,8 +241,8 @@ else()
     target_link_libraries(pixel_pulse PRIVATE SDL3::SDL3)
 endif()
 
-# Add stb headers with warning suppression
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/external/stb/master)
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/external/nlohmann-json/3.12.0)
 
 # Build type
 if(NOT CMAKE_BUILD_TYPE)
