@@ -3,12 +3,11 @@
 #ifndef PIXELPULSE_SCENE_H
 #define PIXELPULSE_SCENE_H
 
-#include "../Platform/Std.h"
-#include "../Libraries/SDL.h"
-#include "Events/UpdateEventPayload.h"
-#include "Events/AttachEventPayload.h"
+#include "RenderPassDescriptor.h"
 #include "SceneNode.h"
-#include "IEntity.h"
+#include "../Platform/Std.h"
+
+struct SDL_Renderer;
 
 namespace PixelPulse::Game
 {
@@ -32,6 +31,7 @@ namespace PixelPulse::Game
 
         void attach(SceneNode *node, SceneNode *parent = nullptr);
         SceneNode *spawn(IEntity *entity);
+        SceneNode *spawnByID(const char *entityID);
 
     private:
         SDL_Renderer *m_renderer;

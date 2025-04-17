@@ -130,7 +130,8 @@ namespace PixelPulse
 
             // Add player entity
             Entities::PlayerEntity *playerEntity = new Entities::PlayerEntity();
-            m_scene->spawn(std::move(playerEntity));
+            m_scene->spawnByID(playerEntity->getID());
+            //m_scene->spawn(std::move(playerEntity));
 
             return true;
         }

@@ -5,10 +5,13 @@
 #include "../Platform/Platform.h"
 #include "../Assets/Image.h"
 #include "../Game/Sprite.h"
+#include "../Game/EntityLibrary.h"
 
 using namespace PixelPulse::Entities;
 using namespace PixelPulse::Game;
 using namespace PixelPulse::Game::Events;
+
+PIXELPULSE_REGISTER_ENTITY(PlayerEntity)
 
 PlayerEntity::PlayerEntity()
 {

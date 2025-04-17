@@ -12,6 +12,10 @@
 #include <vector>
 #include <iostream>
 
+#include <functional>
+#include <unordered_map>
+#include <string>
+
 #define PIXELPULSE_ARG_UNUSED(x) (void)(x)
 
 #endif

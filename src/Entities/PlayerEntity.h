@@ -20,6 +20,11 @@ namespace PixelPulse::Entities
         void onUpdate(Game::SceneNode *ownerNode, const Game::Events::UpdateEventPayload &payload) override;
         void onAttach(Game::SceneNode *ownerNode, const Game::Events::AttachEventPayload &payload) override;
         void onDetach(Game::SceneNode *ownerNode) override;
+
+        Game::EntityID getID() const override
+        {
+            return "PlayerEntity";
+        }
     };
 }
 

@@ -2,6 +2,7 @@
 #include "Events/AttachEventPayload.h"
 #include "../Utilities.h"
 #include "Scene.h"
+#include "EntityLibrary.h"
 
 using namespace PixelPulse::Game;
 
@@ -80,4 +81,24 @@ SceneNode *Scene::spawn(IEntity *entity)
 
     attach(node);
     return node;
+}
+
+SceneNode *Scene::spawnByID(const char *entityID)
+{
+    if (!entityID)
+    {
+        Logger::error("Attempting to spawn with a null entity ID");
+        return nullptr;
+    }
+
+    IEntity *entity = EntityLibrary::getInstance().createEntity(entityID);
+
+    if (!entity)
+    {
+        Logger::error("Failed to create entity with ID: %s", entityID);
+        return nullptr;
+    }
+
+    Logger::info("Spawning entity with ID: %s", entityID);
+    return spawn(entity);
 }

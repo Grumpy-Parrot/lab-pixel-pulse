@@ -10,6 +10,8 @@ namespace PixelPulse::Game
 {
     class SceneNode;
 
+    typedef const char* EntityID;
+
     class IEntity
     {
     public:
@@ -17,6 +19,7 @@ namespace PixelPulse::Game
         virtual void onAttach(SceneNode *ownerNode, const Events::AttachEventPayload &payload) = 0;
         virtual void onUpdate(SceneNode *ownerNode, const Events::UpdateEventPayload &payload) = 0;
         virtual void onDetach(SceneNode *ownerNode) = 0;
+        virtual EntityID getID() const = 0;
     };
 }
 
