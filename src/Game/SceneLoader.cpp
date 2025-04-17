@@ -150,7 +150,11 @@ SceneNode *SceneLoader::parseEntity(Scene *scene, const std::string &entityJson)
         {
             std::string tagStr = entity["tag"].get<std::string>();
             char *tag = PP_NEW_ARRAY(char, tagStr.length() + 1);
+#ifdef PLATFORM_WINDOWS
+            strcpy_s(tag, tagStr.length() + 1, tagStr.c_str());
+#else
             std::strcpy(tag, tagStr.c_str());
+#endif
             node->setTag(tag);
         }
 
