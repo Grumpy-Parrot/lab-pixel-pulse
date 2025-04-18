@@ -6,6 +6,7 @@
 #include "../Platform/Std.h"
 #include "../Math/Vector2.h"
 #include "Events/UpdateEventPayload.h"
+#include "Events/StartEventPayload.h"
 #include "IEntity.h"
 
 struct SDL_Renderer;
@@ -36,6 +37,7 @@ namespace PixelPulse::Game
         void setTag(const char *tag);
         const char *getTag() const { return m_tag; }
 
+        void start(const Events::StartEventPayload &payload);
         void update(const Events::UpdateEventPayload &payload, const Math::Vector2<float> &parentPosition, const Math::Vector2<float> &parentScale);
         void render(::SDL_Renderer *renderer, const Game::RenderPassDescriptor *renderPassDescriptor);
 

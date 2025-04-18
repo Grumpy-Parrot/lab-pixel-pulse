@@ -5,6 +5,7 @@
 
 #include "../../Platform/Std.h"
 #include "../Input.h"
+#include "../../Physics/PhysicsWorld.h"
 
 namespace PixelPulse::Game::Events
 {
@@ -12,6 +13,7 @@ namespace PixelPulse::Game::Events
     {
         float deltaTime;
         Input *input;
+        Physics::PhysicsWorld *physicsWorld;
     };
 }
 

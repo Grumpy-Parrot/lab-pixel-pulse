@@ -33,14 +33,11 @@ namespace PixelPulse::Assets
         void add(IAsset *asset);
         void remove(IAsset *asset);
 
-        // Forcefully remove an asset without waiting for it to be unloaded
-        // This should be used with caution, as it may lead to dangling pointers
+        // Forcefully remove an asset without waiting for it to be unloaded, this should be used with caution, as it may lead to dangling pointers
         void removeImmediately(IAsset *asset);
 
-        // Unloads all assets in the unload queue
         void flushUnloadQueue();
 
-        // Unloads all assets in active use
         void flushActiveQueue();
 
         template <typename T>

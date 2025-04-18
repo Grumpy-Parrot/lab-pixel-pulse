@@ -5,6 +5,7 @@
 
 #include "Platform/Platform.h"
 #include "Platform/Std.h"
+#include <ctime>
 
 namespace PixelPulse
 {

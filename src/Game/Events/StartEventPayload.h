@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef PIXELPULSE_ATTACHEVENTPAYLOAD_H
-#define PIXELPULSE_ATTACHEVENTPAYLOAD_H
+#ifndef PIXELPULSE_STARTEVENTPAYLOAD_H
+#define PIXELPULSE_STARTEVENTPAYLOAD_H
 
 #include "Libraries/SDL.h"
 #include "Platform/Std.h"
@@ -10,7 +10,7 @@
 
 namespace PixelPulse::Game::Events
 {
-    struct AttachEventPayload
+    struct StartEventPayload
     {
         Assets::AssetRegistry *assetRegistry;
         SDL_Renderer *renderer;

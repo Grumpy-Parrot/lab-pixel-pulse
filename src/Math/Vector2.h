@@ -73,6 +73,11 @@ namespace PixelPulse::Math
             return std::sqrt(x * x + y * y);
         }
 
+        T lengthSquared() const
+        {
+            return x * x + y * y;
+        }
+
         using Float = Vector2<float>;
         using Double = Vector2<double>;
         using Int16 = Vector2<std::int16_t>;

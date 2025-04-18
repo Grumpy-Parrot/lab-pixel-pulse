@@ -18,6 +18,7 @@
 #include <unordered_map>
 #include <string>
 #include <mutex>
+#include <algorithm>
 
 #include "Memory.h"
 

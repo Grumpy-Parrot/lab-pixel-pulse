@@ -229,14 +229,6 @@ elseif(EMSCRIPTEN)
         ${SDL_ROOT}/libSDL3.a
     )
 else()
-    # For Linux, assume SDL is installed in the system
-    # or provide path to custom SDL installation
-    # Example for a custom path:
-    # set(SDL_ROOT ${CMAKE_SOURCE_DIR}/external/SDL/3.2.10/linux)
-    # target_include_directories(pixel_pulse PRIVATE ${SDL_ROOT}/include)
-    # target_link_libraries(pixel_pulse PRIVATE ${SDL_ROOT}/lib/libSDL3.a)
-
-    # For system SDL:
     find_package(SDL3 REQUIRED)
     target_link_libraries(pixel_pulse PRIVATE SDL3::SDL3)
 endif()

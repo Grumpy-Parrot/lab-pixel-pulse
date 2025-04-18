@@ -16,6 +16,11 @@ namespace PixelPulse::Game
         class AssetRegistry;
     }
 
+    namespace PixelPulse::Physics
+    {
+        class PhysicsWorld;
+    }
+
     class SceneLoader;
 
     class Scene
@@ -27,7 +32,10 @@ namespace PixelPulse::Game
 
         void setRenderer(SDL_Renderer *renderer) { this->m_renderer = renderer; }
         void setAssetRegistry(Assets::AssetRegistry *assetRegistry) { this->m_assetRegistry = assetRegistry; }
+        void setPhysicsWorld(Physics::PhysicsWorld *physicsWorld) { this->m_physicsWorld = physicsWorld; }
+        Physics::PhysicsWorld* getPhysicsWorld() const { return m_physicsWorld; }
 
+        void start();
         void update(const Events::UpdateEventPayload &payload);
         void render(const Game::RenderPassDescriptor &renderPassDescriptor);
 
@@ -40,6 +48,7 @@ namespace PixelPulse::Game
     private:
         SDL_Renderer *m_renderer;
         Assets::AssetRegistry *m_assetRegistry;
+        Physics::PhysicsWorld *m_physicsWorld;
         SceneNode *m_rootNode;
         std::vector<IEntity *> m_entities;
     };

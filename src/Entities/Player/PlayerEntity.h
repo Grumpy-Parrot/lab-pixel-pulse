@@ -5,6 +5,7 @@
 
 #include "../../Platform/Std.h"
 #include "../../Game/IEntity.h"
+#include "../../Assets/Image.h"
 #include "../../Math/Vector2.h"
 
 namespace PixelPulse::Entities
@@ -13,6 +14,7 @@ namespace PixelPulse::Entities
     {
     private:
         float m_moveSpeed;
+        Assets::Image *m_playerImage;
 
     public:
         PlayerEntity();

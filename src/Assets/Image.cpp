@@ -3,61 +3,62 @@
 #include "Platform/Platform.h"
 #include "Platform/String.h"
 
-using namespace PixelPulse::Assets;
-
-Image::Image() : width(0),
-                 height(0),
-                 channels(0),
-                 data(nullptr)
+namespace PixelPulse::Assets
 {
-}
-
-Image::~Image()
-{
-    if (data)
+    Image::Image() : width(0),
+                     height(0),
+                     channels(0),
+                     data(nullptr)
     {
-        stbi_image_free(data);
     }
-}
 
-bool Image::load()
-{
-    if(data)
+    Image::~Image()
     {
-        Logger::warning("Image data are already loaded: %s", getPath());
+        if (data)
+        {
+            stbi_image_free(data);
+        }
+    }
+
+    bool Image::load()
+    {
+        if (data)
+        {
+            Logger::warning("Image data are already loaded: %s", getPath());
+            return true;
+        }
+
+        const char *pathAbsolute = getPathAbsolute();
+        data = stbi_load(pathAbsolute, &width, &height, &channels, 4);
+
+        if (!data)
+        {
+            Logger::error("Failed to load image: %s", stbi_failure_reason());
+            return false;
+        }
+        else
+        {
+            Logger::info("Loaded image: %s (%dx%d)", pathAbsolute, width, height);
+        }
+
         return true;
     }
 
-    const char *pathAbsolute = getPathAbsolute();
-    data = stbi_load(pathAbsolute, &width, &height, &channels, 4);
-
-    if (!data)
+    void Image::unload()
     {
-        Logger::error("Failed to load image: %s", stbi_failure_reason());
-        return false;
-    }
-    else
-    {
-        Logger::info("Loaded image: %s (%dx%d)", pathAbsolute, width, height);
+        if (data)
+        {
+            stbi_image_free(data);
+            data = nullptr;
+        }
+        else
+        {
+            Logger::warning("Image already unloaded: %s", getPath());
+        }
     }
 
-    return true;
-}
-
-void Image::unload()
-{
-    if (data)
+    bool Image::isLoaded() const
     {
-        stbi_image_free(data);
-        data = nullptr;
+        return data != nullptr;
     }
-    else
-    {
-        Logger::warning("Image already unloaded: %s", getPath());
-    }
-}
-
-bool Image::isLoaded() const
-{
-    return data != nullptr;
 }

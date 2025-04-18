@@ -13,6 +13,7 @@
 #include "Game/SceneNode.h"
 #include "Game/Events/UpdateEventPayload.h"
 #include "Game/Events/AttachEventPayload.h"
+#include "Physics/PhysicsWorld.h"
 
 namespace PixelPulse
 {
@@ -31,6 +32,7 @@ namespace PixelPulse
 
         Game::Scene *m_scene;
         Game::Input m_input;
+        Physics::PhysicsWorld *m_physicsWorld;
 
         static void handleEvents(Application *app)
         {
@@ -72,7 +74,8 @@ namespace PixelPulse
                         m_deltaTime(0.0f),
                         m_window(nullptr),
                         m_renderer(nullptr),
-                        m_scene(nullptr)
+                        m_scene(nullptr),
+                        m_physicsWorld(nullptr)
         {
 #ifdef PLATFORM_WASM
             instance = this;
@@ -121,10 +124,14 @@ namespace PixelPulse
 
             m_assetRegistry = PP_NEW(Assets::AssetRegistry);
 
+            // Initialize physics world
+            m_physicsWorld = PP_NEW(Physics::PhysicsWorld);
+
             // Create scene graph
             m_scene = PP_NEW(Game::Scene);
             m_scene->setRenderer(m_renderer);
             m_scene->setAssetRegistry(m_assetRegistry);
+            m_scene->setPhysicsWorld(m_physicsWorld);
 
             // Load scene from JSON
             if (!m_scene->loadFromJSON("assets/scenes/demo.json"))
@@ -133,6 +140,7 @@ namespace PixelPulse
                 cleanup();
                 return false;
             }
+            m_scene->start();
 
             return true;
         }
@@ -148,6 +156,9 @@ namespace PixelPulse
 
             // Subsystem updates
             m_input.update(m_deltaTime);
+
+            // Update physics world
+            m_physicsWorld->update(m_deltaTime);
 
             Game::Events::UpdateEventPayload updateEventPayload;
             updateEventPayload.deltaTime = m_deltaTime;
@@ -195,6 +206,13 @@ namespace PixelPulse
                 m_scene = nullptr;
             }
 
+            if (m_physicsWorld)
+            {
+                Logger::info("Cleaning up physics world");
+                PP_DELETE(m_physicsWorld);
+                m_physicsWorld = nullptr;
+            }
+
             if (m_assetRegistry)
             {
                 Logger::info("Cleaning up asset registry");
@@ -232,15 +250,18 @@ int main(int argc, char *argv[])
     PIXELPULSE_ARG_UNUSED(argc);
     PIXELPULSE_ARG_UNUSED(argv);
 
-    // Initialize memory system
     PP_MemorySystemInitialize();
 
-    PixelPulse::Application app;
-    if (!app.initialize("Game", 800, 600))
+    PixelPulse::Application *app = PP_NEW(PixelPulse::Application);
+    if (!app->initialize("Game", 800, 600))
     {
         return 1;
     }
 
-    app.run();
+    app->run();
+    PP_DELETE(app);
+
+    PP_MemorySystemShutdown();
+
     return 0;
 }
