@@ -19,6 +19,7 @@ namespace PixelPulse::Entities
     FloorEntity::FloorEntity()
         : m_physicsComponent(nullptr), m_collider(nullptr), m_tileCount(10), m_tileWidth(0.0f), m_floorWidth(2000.0f), m_floorHeight(50.0f)
     {
+        PIXELPULSE_ARG_UNUSED(m_tileCount);
         m_physicsComponent = PP_NEW(PhysicsComponent, this);
     }
 

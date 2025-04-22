@@ -241,17 +241,17 @@ namespace PixelPulse::Platform::Memory
         }
     }
 
-    void *Memory::allocate(size_t size, const char *file, int line, const char *function)
+    void *allocate(size_t size, const char *file, int line, const char *function)
     {
         return MemoryAllocator::getInstance().allocate(size, file, line, function);
     }
 
-    void *Memory::reallocate(void *ptr, size_t newSize, const char *file, int line, const char *function)
+    void *reallocate(void *ptr, size_t newSize, const char *file, int line, const char *function)
     {
         return MemoryAllocator::getInstance().reallocate(ptr, newSize, file, line, function);
     }
 
-    void Memory::free(void *ptr)
+    void free(void *ptr)
     {
         MemoryAllocator::getInstance().deallocate(ptr);
     }
