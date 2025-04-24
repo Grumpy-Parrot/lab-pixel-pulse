@@ -71,6 +71,31 @@ namespace PixelPulse::Physics
         return m_size * 0.5f;
     }
 
+    void BoxCollider::getWorldCorners(Math::Vector2<float> outCorners[4]) const
+    {
+        Math::Vector2<float> center = getWorldPosition();
+        Math::Vector2<float> half = getHalfSize();
+        float rot = m_body->getRotation();
+        float cosR = std::cos(rot);
+        float sinR = std::sin(rot);
+
+        // Local corners (CCW: top-left, top-right, bottom-right, bottom-left)
+        Math::Vector2<float> local[4] = {
+            {-half.x, -half.y},
+            {half.x, -half.y},
+            {half.x, half.y},
+            {-half.x, half.y}};
+
+        for (int i = 0; i < 4; ++i)
+        {
+            float x = local[i].x;
+            float y = local[i].y;
+
+            outCorners[i].x = center.x + x * cosR - y * sinR;
+            outCorners[i].y = center.y + x * sinR + y * cosR;
+        }
+    }
+
     CircleCollider::CircleCollider(RigidBody *body, float radius)
         : Collider(body), m_radius(radius)
     {

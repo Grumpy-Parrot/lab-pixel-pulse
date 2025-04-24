@@ -5,7 +5,21 @@
 namespace PixelPulse::Physics
 {
     RigidBody::RigidBody(PhysicsWorld *world, const Math::Vector2<float> &position)
-        : m_world(world), m_position(position), m_velocity(0.0f, 0.0f), m_force(0.0f, 0.0f), m_rotation(0.0f), m_angularVelocity(0.0f), m_torque(0.0f), m_mass(1.0f), m_inverseMass(1.0f), m_inertia(0.0f), m_inverseInertia(0.0f), m_restitution(0.2f), m_friction(0.1f), m_isStatic(false)
+        : m_world(world),
+          m_position(position),
+          m_velocity(0.0f, 0.0f),
+          m_force(0.0f, 0.0f),
+          m_rotation(0.0f),
+          m_angularVelocity(0.0f),
+          m_angularDamping(0.05f),
+          m_torque(0.0f),
+          m_mass(1.0f),
+          m_inverseMass(1.0f),
+          m_inertia(0.0f),
+          m_inverseInertia(0.0f),
+          m_restitution(0.2f),
+          m_friction(0.1f),
+          m_isStatic(false)
     {
     }
 
@@ -33,6 +47,32 @@ namespace PixelPulse::Physics
         {
             m_velocity += impulse * m_inverseMass;
         }
+    }
+
+    void RigidBody::applyTorque(float torque)
+    {
+        if (!m_isStatic)
+        {
+            m_torque += torque;
+        }
+    }
+
+    void RigidBody::applyAngularImpulse(float impulse)
+    {
+        if (!m_isStatic)
+        {
+            m_angularVelocity += impulse * m_inverseInertia;
+        }
+    }
+
+    void RigidBody::setAngularDamping(float damping)
+    {
+        m_angularDamping = damping;
+    }
+
+    float RigidBody::getAngularDamping() const
+    {
+        return m_angularDamping;
     }
 
     void RigidBody::setPosition(const Math::Vector2<float> &position)
@@ -159,13 +199,11 @@ namespace PixelPulse::Physics
     {
         if (m_isStatic)
             return;
-
         m_velocity += m_force * m_inverseMass * deltaTime;
         m_position += m_velocity * deltaTime;
-
         m_angularVelocity += m_torque * m_inverseInertia * deltaTime;
+        m_angularVelocity *= (1.0f - m_angularDamping);
         m_rotation += m_angularVelocity * deltaTime;
-
         m_force = Math::Vector2<float>(0.0f, 0.0f);
         m_torque = 0.0f;
     }

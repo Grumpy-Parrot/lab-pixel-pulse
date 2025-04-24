@@ -62,6 +62,8 @@ namespace PixelPulse::Physics
 
         Math::Vector2<float> getHalfSize() const;
 
+        void getWorldCorners(Math::Vector2<float> outCorners[4]) const;
+
     private:
         Math::Vector2<float> m_size;
     };

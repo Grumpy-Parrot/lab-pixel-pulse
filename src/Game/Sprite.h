@@ -26,7 +26,7 @@ namespace PixelPulse::Game
         virtual ~Sprite();
 
         bool init(SDL_Renderer *renderer);
-        void render(SDL_Renderer *renderer, const RenderPassDescriptor *renderPassDescriptor, const Math::Vector2<float> &worldPosition, const Math::Vector2<float> &worldScale);
+        void render(SDL_Renderer *renderer, const RenderPassDescriptor *renderPassDescriptor, const Math::Vector2<float> &worldPosition, const Math::Vector2<float> &worldScale, float rotation);
         float getScalingFactor(int windowWidth, int windowHeight) const;
     };
 }

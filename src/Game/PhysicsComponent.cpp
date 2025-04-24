@@ -5,16 +5,14 @@
 
 namespace PixelPulse::Game
 {
-    PhysicsComponent::PhysicsComponent(IEntity* owner)
-        : m_owner(owner)
-        , m_rigidBody(nullptr)
-        , m_physicsWorld(nullptr)
+    PhysicsComponent::PhysicsComponent(IEntity *owner)
+        : m_owner(owner), m_rigidBody(nullptr), m_physicsWorld(nullptr)
     {
     }
 
     PhysicsComponent::~PhysicsComponent()
     {
-        for (auto* collider : m_colliders)
+        for (auto *collider : m_colliders)
         {
             if (m_physicsWorld)
             {
@@ -30,7 +28,7 @@ namespace PixelPulse::Game
         }
     }
 
-    void PhysicsComponent::initialize(Physics::PhysicsWorld* physicsWorld, const Math::Vector2<float>& position)
+    void PhysicsComponent::initialize(Physics::PhysicsWorld *physicsWorld, const Math::Vector2<float> &position)
     {
         if (!physicsWorld)
         {
@@ -42,7 +40,7 @@ namespace PixelPulse::Game
         m_rigidBody = m_physicsWorld->createRigidBody(position);
     }
 
-    Physics::BoxCollider* PhysicsComponent::createBoxCollider(const Math::Vector2<float>& size, const Math::Vector2<float>& offset)
+    Physics::BoxCollider *PhysicsComponent::createBoxCollider(const Math::Vector2<float> &size, const Math::Vector2<float> &offset)
     {
         if (!m_rigidBody || !m_physicsWorld)
         {
@@ -50,7 +48,7 @@ namespace PixelPulse::Game
             return nullptr;
         }
 
-        Physics::BoxCollider* collider = m_physicsWorld->createBoxCollider(m_rigidBody, size);
+        Physics::BoxCollider *collider = m_physicsWorld->createBoxCollider(m_rigidBody, size);
         if (collider)
         {
             collider->setOffset(offset);
@@ -60,7 +58,7 @@ namespace PixelPulse::Game
         return collider;
     }
 
-    Physics::CircleCollider* PhysicsComponent::createCircleCollider(float radius, const Math::Vector2<float>& offset)
+    Physics::CircleCollider *PhysicsComponent::createCircleCollider(float radius, const Math::Vector2<float> &offset)
     {
         if (!m_rigidBody || !m_physicsWorld)
         {
@@ -68,7 +66,7 @@ namespace PixelPulse::Game
             return nullptr;
         }
 
-        Physics::CircleCollider* collider = m_physicsWorld->createCircleCollider(m_rigidBody, radius);
+        Physics::CircleCollider *collider = m_physicsWorld->createCircleCollider(m_rigidBody, radius);
         if (collider)
         {
             collider->setOffset(offset);
@@ -78,7 +76,7 @@ namespace PixelPulse::Game
         return collider;
     }
 
-    void PhysicsComponent::updatePosition(const Math::Vector2<float>& position)
+    void PhysicsComponent::updatePosition(const Math::Vector2<float> &position)
     {
         if (m_rigidBody)
         {
@@ -95,7 +93,7 @@ namespace PixelPulse::Game
         return Math::Vector2<float>(0.0f, 0.0f);
     }
 
-    void PhysicsComponent::setVelocity(const Math::Vector2<float>& velocity)
+    void PhysicsComponent::setVelocity(const Math::Vector2<float> &velocity)
     {
         if (m_rigidBody)
         {
@@ -103,7 +101,7 @@ namespace PixelPulse::Game
         }
     }
 
-    void PhysicsComponent::applyForce(const Math::Vector2<float>& force)
+    void PhysicsComponent::applyForce(const Math::Vector2<float> &force)
     {
         if (m_rigidBody)
         {
@@ -111,7 +109,7 @@ namespace PixelPulse::Game
         }
     }
 
-    void PhysicsComponent::applyImpulse(const Math::Vector2<float>& impulse)
+    void PhysicsComponent::applyImpulse(const Math::Vector2<float> &impulse)
     {
         if (m_rigidBody)
         {
@@ -127,7 +125,7 @@ namespace PixelPulse::Game
         }
     }
 
-    void PhysicsComponent::onCollisionEnter(Physics::Collider* self, Physics::Collider* other, const Physics::CollisionInfo& info)
+    void PhysicsComponent::onCollisionEnter(Physics::Collider *self, Physics::Collider *other, const Physics::CollisionInfo &info)
     {
         PIXELPULSE_ARG_UNUSED(self);
 
@@ -137,7 +135,7 @@ namespace PixelPulse::Game
         }
     }
 
-    void PhysicsComponent::onCollisionStay(Physics::Collider* self, Physics::Collider* other, const Physics::CollisionInfo& info)
+    void PhysicsComponent::onCollisionStay(Physics::Collider *self, Physics::Collider *other, const Physics::CollisionInfo &info)
     {
         PIXELPULSE_ARG_UNUSED(self);
 
@@ -147,9 +145,76 @@ namespace PixelPulse::Game
         }
     }
 
-    void PhysicsComponent::onCollisionExit(Physics::Collider* self, Physics::Collider* other)
+    void PhysicsComponent::onCollisionExit(Physics::Collider *self, Physics::Collider *other)
     {
         PIXELPULSE_ARG_UNUSED(self);
         PIXELPULSE_ARG_UNUSED(other);
+    }
+
+    void PhysicsComponent::setRotation(float rotation)
+    {
+        if (m_rigidBody)
+        {
+            m_rigidBody->setRotation(rotation);
+        }
+    }
+
+    float PhysicsComponent::getRotation() const
+    {
+        if (m_rigidBody)
+        {
+            return m_rigidBody->getRotation();
+        }
+        return 0.0f;
+    }
+
+    void PhysicsComponent::setAngularVelocity(float angularVelocity)
+    {
+        if (m_rigidBody)
+        {
+            m_rigidBody->setAngularVelocity(angularVelocity);
+        }
+    }
+
+    float PhysicsComponent::getAngularVelocity() const
+    {
+        if (m_rigidBody)
+        {
+            return m_rigidBody->getAngularVelocity();
+        }
+        return 0.0f;
+    }
+
+    void PhysicsComponent::applyTorque(float torque)
+    {
+        if (m_rigidBody)
+        {
+            m_rigidBody->applyTorque(torque);
+        }
+    }
+
+    void PhysicsComponent::applyAngularImpulse(float impulse)
+    {
+        if (m_rigidBody)
+        {
+            m_rigidBody->applyAngularImpulse(impulse);
+        }
+    }
+
+    void PhysicsComponent::setAngularDamping(float damping)
+    {
+        if (m_rigidBody)
+        {
+            m_rigidBody->setAngularDamping(damping);
+        }
+    }
+
+    float PhysicsComponent::getAngularDamping() const
+    {
+        if (m_rigidBody)
+        {
+            return m_rigidBody->getAngularDamping();
+        }
+        return 0.0f;
     }
 }

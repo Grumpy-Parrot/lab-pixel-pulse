@@ -66,6 +66,8 @@ namespace PixelPulse::Entities
         m_physicsComponent->setStatic(true);
 
         m_collider = m_physicsComponent->createBoxCollider(Math::Vector2<float>(m_floorWidth, m_floorHeight));
+        m_physicsComponent->getRigidBody()->setFriction(1.0f);
+        m_physicsComponent->getRigidBody()->setRestitution(0.0f);
     }
 
     void FloorEntity::onDetach(SceneNode *ownerNode)

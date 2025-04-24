@@ -60,7 +60,7 @@ namespace PixelPulse::Game
         return std::min(widthRatio, heightRatio);
     }
 
-    void Sprite::render(SDL_Renderer *renderer, const RenderPassDescriptor *renderPassDescriptor, const Math::Vector2<float> &worldPosition, const Math::Vector2<float> &worldScale)
+    void Sprite::render(SDL_Renderer *renderer, const RenderPassDescriptor *renderPassDescriptor, const Math::Vector2<float> &worldPosition, const Math::Vector2<float> &worldScale, float rotation)
     {
         if (m_texture)
         {
@@ -79,7 +79,7 @@ namespace PixelPulse::Game
             dstRect.h = scaledHeight;
 
             SDL_SetTextureBlendMode(m_texture, SDL_BLENDMODE_BLEND);
-            SDL_RenderTexture(renderer, m_texture, nullptr, &dstRect);
+            SDL_RenderTextureRotated(renderer, m_texture, nullptr, &dstRect, static_cast<double>(rotation), nullptr, SDL_FLIP_NONE);
         }
     }
 }

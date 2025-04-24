@@ -34,6 +34,7 @@ namespace PixelPulse::Entities
 
         Math::Vector2<float> position = m_physicsComponent->getPosition();
         ownerNode->m_position = position;
+        ownerNode->m_rotation = m_physicsComponent->getRotation();
     }
 
     void EnemyEntity::onAttach(SceneNode *ownerNode, const AttachEventPayload &payload)
@@ -63,7 +64,11 @@ namespace PixelPulse::Entities
         }
 
         m_physicsComponent->initialize(payload.physicsWorld, ownerNode->m_position);
+        m_physicsComponent->setRotation(ownerNode->m_rotation);
         m_collider = m_physicsComponent->createBoxCollider(Math::Vector2<float>(50.0f, 50.0f));
+        m_physicsComponent->getRigidBody()->setFriction(1.0f);
+        m_physicsComponent->getRigidBody()->setRestitution(0.0f);
+        m_physicsComponent->getRigidBody()->setAngularDamping(0.5f);
     }
 
     void EnemyEntity::onDetach(SceneNode *ownerNode)

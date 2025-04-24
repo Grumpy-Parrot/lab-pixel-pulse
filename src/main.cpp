@@ -103,6 +103,8 @@ namespace PixelPulse
 
             m_currentTime = m_previousTime = SDL_GetTicks();
 
+            SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
+
             if (!SDL_CreateWindowAndRenderer(title, width, height,
                                              SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE, &m_window, &m_renderer))
             {

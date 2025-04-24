@@ -18,6 +18,10 @@ namespace PixelPulse::Physics
 
         void applyForce(const Math::Vector2<float> &force);
         void applyImpulse(const Math::Vector2<float> &impulse);
+        void applyTorque(float torque);
+        void applyAngularImpulse(float impulse);
+        void setAngularDamping(float damping);
+        float getAngularDamping() const;
 
         void setPosition(const Math::Vector2<float> &position);
         const Math::Vector2<float> &getPosition() const;
@@ -59,6 +63,7 @@ namespace PixelPulse::Physics
 
         float m_rotation;
         float m_angularVelocity;
+        float m_angularDamping;
         float m_torque;
 
         float m_mass;

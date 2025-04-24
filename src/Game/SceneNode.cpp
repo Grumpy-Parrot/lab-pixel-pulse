@@ -1,4 +1,3 @@
-
 #include "SceneNode.h"
 #include "Sprite.h"
 #include "../Platform/Platform.h"
@@ -83,7 +82,7 @@ namespace PixelPulse::Game
     {
         if (m_sprite)
         {
-            m_sprite->render(renderer, renderPassDescriptor, m_position, m_scale);
+            m_sprite->render(renderer, renderPassDescriptor, m_position, m_scale, m_rotation);
         }
 
         for (const auto &child : m_children)

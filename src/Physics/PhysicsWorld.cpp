@@ -223,33 +223,86 @@ namespace PixelPulse::Physics
         RigidBody *bodyA = info.colliderA->getBody();
         RigidBody *bodyB = info.colliderB->getBody();
 
-        Math::Vector2<float> relativeVelocity = bodyB->getVelocity() - bodyA->getVelocity();
+        // For OBB, estimate contact point as midpoint between centers (for simplicity)
+        Math::Vector2<float> contactPoint = (bodyA->getPosition() + bodyB->getPosition()) * 0.5f;
+        Math::Vector2<float> ra = contactPoint - bodyA->getPosition();
+        Math::Vector2<float> rb = contactPoint - bodyB->getPosition();
 
-        float velocityAlongNormal = relativeVelocity.x * info.normal.x + relativeVelocity.y * info.normal.y;
+        Math::Vector2<float> velA = bodyA->getVelocity();
+        Math::Vector2<float> velB = bodyB->getVelocity();
+        float angVelA = bodyA->getAngularVelocity();
+        float angVelB = bodyB->getAngularVelocity();
 
-        if (velocityAlongNormal > 0)
+        // Calculate relative velocity at contact
+        Math::Vector2<float> relVel = (velB + Math::Vector2<float>(-angVelB * rb.y, angVelB * rb.x)) -
+                                      (velA + Math::Vector2<float>(-angVelA * ra.y, angVelA * ra.x));
+        float velAlongNormal = relVel.x * info.normal.x + relVel.y * info.normal.y;
+        if (velAlongNormal > 0)
+        {
             return;
+        }
 
         float restitution = std::min(bodyA->getRestitution(), bodyB->getRestitution());
 
-        float j = -(1.0f + restitution) * velocityAlongNormal;
-        j /= bodyA->getInverseMass() + bodyB->getInverseMass();
+        // Calculate denominator for impulse scalar
+        float raCrossN = ra.x * info.normal.y - ra.y * info.normal.x;
+        float rbCrossN = rb.x * info.normal.y - rb.y * info.normal.x;
+        float invMassSum = bodyA->getInverseMass() + bodyB->getInverseMass() +
+                           (raCrossN * raCrossN) * bodyA->m_inverseInertia +
+                           (rbCrossN * rbCrossN) * bodyB->m_inverseInertia;
+
+        float j = -(1.0f + restitution) * velAlongNormal;
+        j /= invMassSum;
 
         Math::Vector2<float> impulse = info.normal * j;
-
         bodyA->applyImpulse(impulse * -1.0f);
         bodyB->applyImpulse(impulse);
+        bodyA->applyAngularImpulse(-raCrossN * j);
+        bodyB->applyAngularImpulse(rbCrossN * j);
 
+        // Friction impulse
+        // Recompute relative velocity at contact after normal impulse
+        velA = bodyA->getVelocity();
+        velB = bodyB->getVelocity();
+        angVelA = bodyA->getAngularVelocity();
+        angVelB = bodyB->getAngularVelocity();
+        relVel = (velB + Math::Vector2<float>(-angVelB * rb.y, angVelB * rb.x)) -
+                 (velA + Math::Vector2<float>(-angVelA * ra.y, angVelA * ra.x));
+
+        // Tangent direction
+        Math::Vector2<float> tangent = relVel - info.normal * (relVel.x * info.normal.x + relVel.y * info.normal.y);
+        float tangentLen = tangent.length();
+        if (tangentLen > 0.0001f)
+            tangent = tangent / tangentLen;
+        else
+            tangent = Math::Vector2<float>(0.0f, 0.0f);
+
+        // Friction coefficient (combine both bodies)
+        float friction = std::sqrt(bodyA->getFriction() * bodyB->getFriction());
+        float jt = -(relVel.x * tangent.x + relVel.y * tangent.y);
+        jt /= invMassSum;
+
+        // Coulomb's law
+        float maxFriction = friction * std::abs(j);
+        if (std::abs(jt) > maxFriction)
+            jt = (jt > 0 ? 1 : -1) * maxFriction;
+        Math::Vector2<float> frictionImpulse = tangent * jt;
+        bodyA->applyImpulse(frictionImpulse * -1.0f);
+        bodyB->applyImpulse(frictionImpulse);
+
+        // Angular friction
+        bodyA->applyAngularImpulse(-(ra.x * frictionImpulse.y - ra.y * frictionImpulse.x));
+        bodyB->applyAngularImpulse((rb.x * frictionImpulse.y - rb.y * frictionImpulse.x));
+
+        // Positional correction (same as before)
         const float percent = 0.8f;
         const float slop = 0.001f;
         Math::Vector2<float> correction = info.normal *
                                           (std::max(info.penetration - slop, 0.0f) /
                                            (bodyA->getInverseMass() + bodyB->getInverseMass())) *
                                           percent;
-
         if (!bodyA->isStatic())
             bodyA->setPosition(bodyA->getPosition() - correction * bodyA->getInverseMass());
-
         if (!bodyB->isStatic())
             bodyB->setPosition(bodyB->getPosition() + correction * bodyB->getInverseMass());
     }
@@ -287,31 +340,54 @@ namespace PixelPulse::Physics
 
     bool PhysicsWorld::checkBoxBox(BoxCollider *a, BoxCollider *b, CollisionInfo &info)
     {
-        Math::Vector2<float> posA = a->getWorldPosition();
-        Math::Vector2<float> posB = b->getWorldPosition();
+        // OBB-vs-OBB collision using SAT
+        Math::Vector2<float> cornersA[4], cornersB[4];
+        a->getWorldCorners(cornersA);
+        b->getWorldCorners(cornersB);
 
-        Math::Vector2<float> halfSizeA = a->getHalfSize();
-        Math::Vector2<float> halfSizeB = b->getHalfSize();
-
-        Math::Vector2<float> delta = posB - posA;
-
-        float overlapX = halfSizeA.x + halfSizeB.x - std::abs(delta.x);
-        float overlapY = halfSizeA.y + halfSizeB.y - std::abs(delta.y);
-
-        if (overlapX < 0 || overlapY < 0)
-            return false;
-
-        if (overlapX < overlapY)
+        // Axes to test: 2 from A, 2 from B (normals of edges)
+        Math::Vector2<float> axes[4];
+        for (int i = 0; i < 2; ++i)
         {
-            info.normal = Math::Vector2<float>(delta.x < 0 ? -1.0f : 1.0f, 0.0f);
-            info.penetration = overlapX;
+            Math::Vector2<float> edge = cornersA[(i + 1) % 4] - cornersA[i];
+            axes[i] = Math::Vector2<float>(-edge.y, edge.x).normalize();
         }
-        else
+        for (int i = 0; i < 2; ++i)
         {
-            info.normal = Math::Vector2<float>(0.0f, delta.y < 0 ? -1.0f : 1.0f);
-            info.penetration = overlapY;
+            Math::Vector2<float> edge = cornersB[(i + 1) % 4] - cornersB[i];
+            axes[2 + i] = Math::Vector2<float>(-edge.y, edge.x).normalize();
         }
 
+        float minPenetration = std::numeric_limits<float>::max();
+        Math::Vector2<float> minAxis;
+        for (int i = 0; i < 4; ++i)
+        {
+            float minA = std::numeric_limits<float>::max(), maxA = -std::numeric_limits<float>::max();
+            float minB = std::numeric_limits<float>::max(), maxB = -std::numeric_limits<float>::max();
+            for (int j = 0; j < 4; ++j)
+            {
+                float projA = cornersA[j].x * axes[i].x + cornersA[j].y * axes[i].y;
+                minA = std::min(minA, projA);
+                maxA = std::max(maxA, projA);
+                float projB = cornersB[j].x * axes[i].x + cornersB[j].y * axes[i].y;
+                minB = std::min(minB, projB);
+                maxB = std::max(maxB, projB);
+            }
+            float overlap = std::min(maxA, maxB) - std::max(minA, minB);
+            if (overlap < 0)
+                return false; // Separating axis found
+            if (overlap < minPenetration)
+            {
+                minPenetration = overlap;
+                minAxis = axes[i];
+            }
+        }
+        // Direction from A to B
+        Math::Vector2<float> d = b->getWorldPosition() - a->getWorldPosition();
+        if (d.x * minAxis.x + d.y * minAxis.y < 0)
+            minAxis = minAxis * -1.0f;
+        info.normal = minAxis;
+        info.penetration = minPenetration;
         return true;
     }
 
