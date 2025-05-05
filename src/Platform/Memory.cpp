@@ -100,6 +100,7 @@ namespace PixelPulse::Platform::Memory
             Logger::error("Memory allocation failed! Requested size: %zu bytes", size);
         }
 
+        ::memset(ptr, 0, size);
         return ptr;
     }
 

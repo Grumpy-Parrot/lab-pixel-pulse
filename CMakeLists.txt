@@ -16,6 +16,7 @@ if(EMSCRIPTEN)
     set(EMSCRIPTEN_FLAGS
         "-s USE_SDL=0"
         "-s ALLOW_MEMORY_GROWTH=1"
+        "-s MIN_WEBGL_VERSION=2"
         "-s MAX_WEBGL_VERSION=2"
         "-s FETCH=1"
         "-s USE_PTHREADS=0"

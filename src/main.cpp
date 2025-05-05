@@ -105,6 +105,17 @@ namespace PixelPulse
 
             SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
 
+#if defined(PLATFORM_MACOS)
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+#elif defined(PLATFORM_WASM)
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#endif
+
             if (!SDL_CreateWindowAndRenderer(title, width, height,
                                              SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE, &m_window, &m_renderer))
             {

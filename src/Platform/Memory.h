@@ -3,7 +3,7 @@
 #ifndef PIXELPULSE_MEMORY_H
 #define PIXELPULSE_MEMORY_H
 
-#include "Platform/Std.h"
+#include "./Std.h"
 
 void PP_MemorySystemInitialize();     // Initialize the memory system
 void PP_MemorySystemEnableTracking(); // Begin tracking memory allocations
